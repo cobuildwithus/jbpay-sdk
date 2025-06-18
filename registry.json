@@ -1,0 +1,49 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "jbpay-sdk",
+  "homepage": "https://jbpay.money",
+  "items": [
+    {
+      "name": "pay-project-form",
+      "type": "registry:component",
+      "title": "Pay Project Form",
+      "description": "A form to pay a project",
+      "registryDependencies": ["card", "input", "button", "label", "popover", "dialog"],
+      "dependencies": ["wagmi", "@tanstack/react-query", "viem"],
+      "files": [
+        {
+          "path": "registry/juicebox/pay-project-form/pay-project-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/components/connect-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/components/select-chain.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/components/confirm-transaction.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/components/chain-balance.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/lib/chains.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/lib/quote.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/hooks/use-project.ts",
+          "type": "registry:hook"
+        }
+      ]
+    }
+  ]
+}

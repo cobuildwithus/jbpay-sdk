@@ -1,0 +1,39 @@
+import { useQuery } from "@tanstack/react-query";
+
+export interface Project {
+  chainId: number;
+  projectId: number;
+  name: string;
+  tagline: string;
+  token: {
+    name: string;
+    symbol: string;
+    address: string;
+    price: string;
+    disclosure: string;
+  };
+}
+
+export const useProject = (args: {
+  chainId: number;
+  projectId: number | string;
+  enabled?: boolean;
+}) => {
+  const { chainId, projectId, enabled = true } = args;
+  return useQuery({
+    queryKey: ["project", chainId, projectId],
+    queryFn: async () => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/project/${chainId}/${projectId}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch project: ${response.status} ${response.statusText}`);
+      }
+
+      return response.json() as Promise<Project>;
+    },
+    enabled: enabled && chainId > 0 && Number(projectId) > 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
