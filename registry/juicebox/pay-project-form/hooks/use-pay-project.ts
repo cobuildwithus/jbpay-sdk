@@ -9,8 +9,11 @@ import {
   useWriteContract,
   type BaseError,
 } from "wagmi";
-import { jbMultiTerminalAbi } from "../lib/abis";
-import { ETH_ADDRESS, JBMULTITERMINAL_ADDRESS } from "../lib/chains";
+import { jbMultiTerminalAbi } from "@/registry/juicebox/pay-project-form/lib/abis";
+import {
+  ETH_ADDRESS,
+  JBMULTITERMINAL_ADDRESS,
+} from "@/registry/juicebox/pay-project-form/lib/chains";
 
 interface Args {
   projectId: bigint;

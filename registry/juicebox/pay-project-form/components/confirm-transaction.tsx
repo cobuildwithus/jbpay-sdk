@@ -12,11 +12,11 @@ import {
 import { cn } from "@/lib/utils";
 import { Chain } from "viem";
 import { useAccount } from "wagmi";
-import { Status, usePayProject } from "../hooks/use-pay-project";
-import { Project } from "../hooks/use-project";
-import { ETH_ADDRESS } from "../lib/chains";
-import { calculateTokensFromEth } from "../lib/quote";
-import { ConnectButton } from "./connect-button";
+import { Status, usePayProject } from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
+import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-project";
+import { ETH_ADDRESS } from "@/registry/juicebox/pay-project-form/lib/chains";
+import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
+import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
 
 interface Props {
   isOpen: boolean;

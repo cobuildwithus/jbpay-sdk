@@ -4,20 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";
+import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
+import { SelectChain } from "@/registry/juicebox/pay-project-form/components/select-chain";
+import { useProject } from "@/registry/juicebox/pay-project-form/hooks/use-project";
+import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
+import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
 import { useEffect, useState } from "react";
 import { Chain, formatEther } from "viem";
 import { mainnet } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
-import { TransactionConfirmationModal } from "./components/confirm-transaction";
-import { ConnectButton } from "./components/connect-button";
-import { SelectChain } from "./components/select-chain";
-import { useProject } from "./hooks/use-project";
-import { jbChains } from "./lib/chains";
-import { calculateTokensFromEth } from "./lib/quote";
 
 export function PayProjectForm() {
   const [projectId, setProjectId] = useState("");
-  const [selectedChain, setSelectedChain] = useState(jbChains[0]);
+  const [selectedChain, setSelectedChain] = useState<Chain>(jbChains[0]);
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChainPopover, setShowChainPopover] = useState(false);
@@ -59,7 +59,7 @@ export function PayProjectForm() {
             <div className="border border-border rounded-lg p-2 space-y-3">
               <SelectChain
                 selectedChain={selectedChain}
-                onSelect={(chain: Chain) => {
+                onSelect={(chain) => {
                   setSelectedChain(chain);
                   setShowChainPopover(false);
                 }}

@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { ChainBalance } from "@/registry/juicebox/pay-project-form/components/chain-balance";
+import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { Chain } from "viem";
-import { jbChains } from "../lib/chains";
-import { ChainBalance } from "./chain-balance";
 
 interface Props {
   selectedChain: Chain;
