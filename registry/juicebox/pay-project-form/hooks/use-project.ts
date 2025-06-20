@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
+const API_URL = process.env.NEXT_PUBLIC_JBSDK_API_URL || "https://jbdb.up.railway.app";
+
 export interface Project {
   chainId: number;
   projectId: number;
@@ -23,9 +25,7 @@ export const useProject = (args: {
   return useQuery({
     queryKey: ["project", chainId, projectId],
     queryFn: async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/project/${chainId}/${projectId}`
-      );
+      const response = await fetch(`${API_URL}/project/${chainId}/${projectId}`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch project: ${response.status} ${response.statusText}`);
