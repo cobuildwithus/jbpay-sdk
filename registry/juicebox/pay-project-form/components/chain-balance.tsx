@@ -11,10 +11,10 @@ export function ChainBalance(props: Props) {
   const { chainId } = props;
 
   const { address } = useAccount();
-  const { data: balance } = useBalance({ chainId, address });
+  const { data: balance, isLoading } = useBalance({ chainId, address });
 
-  if (!address) return "0.00";
-  if (!balance) return "?.??";
+  if (isLoading) return "?.????";
+  if (!address || !balance) return "0.0000";
 
   return Number(formatEther(balance.value)).toFixed(4);
 }

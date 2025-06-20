@@ -12,12 +12,12 @@ import { TransactionConfirmationModal } from "./components/confirm-transaction";
 import { ConnectButton } from "./components/connect-button";
 import { SelectChain } from "./components/select-chain";
 import { useProject } from "./hooks/use-project";
-import { juiceboxChains } from "./lib/chains";
+import { jbChains } from "./lib/chains";
 import { calculateTokensFromEth } from "./lib/quote";
 
 export function PayProjectForm() {
   const [projectId, setProjectId] = useState("");
-  const [selectedChain, setSelectedChain] = useState(juiceboxChains[0]);
+  const [selectedChain, setSelectedChain] = useState(jbChains[0]);
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChainPopover, setShowChainPopover] = useState(false);
@@ -101,7 +101,7 @@ export function PayProjectForm() {
             <Button
               type="button"
               onClick={() => setShowConfirmModal(true)}
-              disabled={!amount || !project}
+              disabled={Number(amount) <= 0 || !project}
               className="w-full h-12 text-lg font-medium"
               size="lg"
             >
@@ -110,7 +110,7 @@ export function PayProjectForm() {
           )}
 
           <div
-            className={`text-center text-sm text-muted-foreground transition-opacity duration-300 ${
+            className={`text-center text-sm text-muted-foreground transition-opacity duration-300 -mt-2.5 ${
               project && amount && Number.parseFloat(amount) > 0 ? "opacity-100" : "opacity-0"
             }`}
           >

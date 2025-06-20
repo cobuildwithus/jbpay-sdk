@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Chain } from "viem";
-import { juiceboxChains } from "../lib/chains";
+import { jbChains } from "../lib/chains";
 import { ChainBalance } from "./chain-balance";
 
 interface Props {
@@ -45,7 +45,7 @@ export function SelectChain(props: Props) {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-4">
         <div className="space-y-1">
-          {juiceboxChains.map((chain) => (
+          {jbChains.map((chain) => (
             <button
               type="button"
               key={chain.id}

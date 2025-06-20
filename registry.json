@@ -40,7 +40,15 @@
           "type": "registry:lib"
         },
         {
+          "path": "registry/juicebox/pay-project-form/lib/abis.ts",
+          "type": "registry:lib"
+        },
+        {
           "path": "registry/juicebox/pay-project-form/hooks/use-project.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/juicebox/pay-project-form/hooks/use-pay-project.ts",
           "type": "registry:hook"
         }
       ]

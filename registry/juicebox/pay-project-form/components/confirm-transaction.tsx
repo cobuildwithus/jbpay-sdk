@@ -9,9 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { Chain } from "viem";
+import { useAccount } from "wagmi";
+import { Status, usePayProject } from "../hooks/use-pay-project";
 import { Project } from "../hooks/use-project";
+import { ETH_ADDRESS } from "../lib/chains";
 import { calculateTokensFromEth } from "../lib/quote";
+import { ConnectButton } from "./connect-button";
 
 interface Props {
   isOpen: boolean;
@@ -23,9 +28,16 @@ interface Props {
 
 export function TransactionConfirmationModal(props: Props) {
   const { isOpen, onOpenChange, amount, project, chain } = props;
+  const { payProject, errorMessage, status, reset } = usePayProject(chain.id);
+  const { address } = useAccount();
+
+  const closeModal = () => {
+    reset();
+    onOpenChange(false);
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={closeModal}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Confirm Payment</DialogTitle>
@@ -75,20 +87,61 @@ export function TransactionConfirmationModal(props: Props) {
           )}
         </div>
 
-        <DialogFooter className="flex gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {
-              console.debug({ chain, amount, project });
-            }}
-            className="flex-1"
-          >
-            Confirm Payment
-          </Button>
+        <DialogFooter>
+          <div className="flex flex-col gap-4 w-full">
+            <div className="flex gap-2 w-full">
+              <Button variant="outline" onClick={closeModal} className="flex-1">
+                Cancel
+              </Button>
+              {!address && (
+                <ConnectButton variant="outline" className="flex-1">
+                  Connect Wallet
+                </ConnectButton>
+              )}
+              {address && (
+                <Button
+                  onClick={() => {
+                    payProject({
+                      projectId: BigInt(project.projectId),
+                      token: ETH_ADDRESS,
+                      amount,
+                      beneficiary: address,
+                    });
+                  }}
+                  className="flex-1"
+                >
+                  Confirm Payment
+                </Button>
+              )}
+            </div>
+            <div
+              className={cn("text-xs text-muted-foreground text-center min-h-4 -mt-1", {
+                "text-destructive": status === "error",
+                "animate-pulse":
+                  status === "pending" || status === "connecting" || status === "confirming",
+              })}
+            >
+              {getStatusMessage(status, errorMessage)}
+            </div>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
+}
+
+function getStatusMessage(status: Status, errorMessage: string) {
+  switch (status) {
+    case "idle":
+      return "";
+    case "connecting":
+    case "pending":
+      return "Please confirm transaction...";
+    case "confirming":
+      return "Transaction in progress...";
+    case "success":
+      return "Transaction confirmed!";
+    case "error":
+      return "Error: " + errorMessage.replace("User ", "You ");
+  }
 }
