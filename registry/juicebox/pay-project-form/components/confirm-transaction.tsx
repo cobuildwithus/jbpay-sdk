@@ -12,8 +12,11 @@ import {
 import { cn } from "@/lib/utils";
 import { Chain } from "viem";
 import { useAccount } from "wagmi";
-import { Status, usePayProject } from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
-import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-project";
+import {
+  Status,
+  usePayProject,
+} from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
+import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { ETH_ADDRESS } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
 import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
@@ -69,9 +72,12 @@ export function TransactionConfirmationModal(props: Props) {
               </span>
             </div>
             <div className="flex justify-between items-center mt-2">
-              <span className="text-sm text-muted-foreground">You Receive:</span>
+              <span className="text-sm text-muted-foreground">
+                You Receive:
+              </span>
               <span className="text-lg font-medium">
-                ~{calculateTokensFromEth(amount, project.token.price)} {project.token.symbol}
+                ~{calculateTokensFromEth(amount, project.token.price)}{" "}
+                {project.token.symbol}
               </span>
             </div>
           </div>
@@ -115,11 +121,16 @@ export function TransactionConfirmationModal(props: Props) {
               )}
             </div>
             <div
-              className={cn("text-xs text-muted-foreground text-center min-h-4 -mt-1", {
-                "text-destructive": status === "error",
-                "animate-pulse":
-                  status === "pending" || status === "connecting" || status === "confirming",
-              })}
+              className={cn(
+                "text-xs text-muted-foreground text-center min-h-4 -mt-1",
+                {
+                  "text-destructive": status === "error",
+                  "animate-pulse":
+                    status === "pending" ||
+                    status === "connecting" ||
+                    status === "confirming",
+                }
+              )}
             >
               {getStatusMessage(status, errorMessage)}
             </div>

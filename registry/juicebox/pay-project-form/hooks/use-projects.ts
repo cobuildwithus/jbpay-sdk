@@ -17,16 +17,17 @@ export interface Project {
     price: string;
     disclosure: string;
   };
+  suckerGroupId: string;
 }
 
-export const useProject = (args: {
+export const useProjects = (args: {
   chainId: number;
   projectId: number | string;
   enabled?: boolean;
 }) => {
   const { chainId, projectId, enabled = true } = args;
   return useQuery({
-    queryKey: ["project", chainId, projectId],
+    queryKey: ["projects", chainId, projectId],
     queryFn: async () => {
       const response = await fetch(
         `${API_URL}/project/${chainId}/${projectId}`
@@ -34,12 +35,13 @@ export const useProject = (args: {
 
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch project: ${response.status} ${response.statusText}`
+          `Failed to fetch projects: ${response.status} ${response.statusText}`
         );
       }
 
-      return response.json() as Promise<Project>;
+      return response.json() as Promise<Project[]>;
     },
+    // Only fire if both chainId and projectId are set
     enabled: enabled && chainId > 0 && Number(projectId) > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

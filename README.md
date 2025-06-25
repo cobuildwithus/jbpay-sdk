@@ -37,15 +37,19 @@ Components support both light and dark themes using Tailwind CSS's dark mode fea
 
 ### Environment Variables
 
-The pay-project-form component supports the following optional environment variable:
+The pay-project-form component supports the following optional environment variables:
 
 - `NEXT_PUBLIC_PROJECT_ID` - When set, this will hide the project ID input field and hardcode the form to use the specified project ID.
+- `NEXT_PUBLIC_DEFAULT_CHAIN_ID` - When set, this will set the default chain for the form. The chain ID must be one of the supported chains.
 
 Example:
 
 ```env
 NEXT_PUBLIC_PROJECT_ID=123
+NEXT_PUBLIC_DEFAULT_CHAIN_ID=1
 ```
+
+Note: The form will only fetch project data when both a chain ID and project ID are set. Available chains in the dropdown are filtered based on which chains the project exists on.
 
 ## Development
 

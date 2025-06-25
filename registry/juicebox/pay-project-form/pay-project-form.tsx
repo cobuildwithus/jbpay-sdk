@@ -7,20 +7,32 @@ import { Label } from "@/components/ui/label";
 import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";
 import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
 import { SelectChain } from "@/registry/juicebox/pay-project-form/components/select-chain";
-import { useProject } from "@/registry/juicebox/pay-project-form/hooks/use-project";
+import { useProjects } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Chain, formatEther } from "viem";
 import { mainnet } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
 
-// Optional environment variable to hardcode project ID
+// Optional environment variables
 const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
+const DEFAULT_CHAIN_ID = process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID;
 
 export function PayProjectForm() {
   const [projectId, setProjectId] = useState(HARDCODED_PROJECT_ID || "");
-  const [selectedChain, setSelectedChain] = useState<Chain>(jbChains[0]);
+
+  // Find the default chain or use the first available chain
+  const defaultChain = useMemo(() => {
+    if (DEFAULT_CHAIN_ID) {
+      const chainId = Number(DEFAULT_CHAIN_ID);
+      const foundChain = jbChains.find((chain) => chain.id === chainId);
+      if (foundChain) return foundChain;
+    }
+    return jbChains[0];
+  }, []);
+
+  const [selectedChain, setSelectedChain] = useState<Chain>(defaultChain);
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChainPopover, setShowChainPopover] = useState(false);
@@ -29,14 +41,40 @@ export function PayProjectForm() {
   const { isConnected, address } = useAccount();
   const { data: balance } = useBalance({ chainId: selectedChain.id, address });
 
-  const { data: project } = useProject({
+  // Fetch projects - only fires if both chainId and projectId are set
+  const { data: projects } = useProjects({
     chainId: selectedChain.id,
     projectId,
   });
 
+  // Get the project for the selected chain
+  const project = useMemo(() => {
+    if (!projects || projects.length === 0) return null;
+    console.log(projects);
+    return projects.find((p) => p.chainId === selectedChain.id) || null;
+  }, [projects, selectedChain.id]);
+
+  // Get available chains based on the projects returned from API
+  const availableChains = useMemo(() => {
+    if (!projects || projects.length === 0) return jbChains;
+
+    const projectChainIds = projects.map((p) => p.chainId);
+    return jbChains.filter((chain) => projectChainIds.includes(chain.id));
+  }, [projects]);
+
   useEffect(() => {
     setShowConnectButton(!isConnected);
   }, [isConnected]);
+
+  // Update selected chain if current chain is not available
+  useEffect(() => {
+    if (
+      availableChains.length > 0 &&
+      !availableChains.find((chain) => chain.id === selectedChain.id)
+    ) {
+      setSelectedChain(availableChains[0]);
+    }
+  }, [availableChains, selectedChain]);
 
   return (
     <>
@@ -75,6 +113,7 @@ export function PayProjectForm() {
                 }}
                 isOpen={showChainPopover}
                 onOpenChange={setShowChainPopover}
+                availableChains={availableChains}
               />
 
               <div className="relative">

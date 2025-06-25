@@ -1,7 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { ChainBalance } from "@/registry/juicebox/pay-project-form/components/chain-balance";
 import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
@@ -12,10 +16,17 @@ interface Props {
   onSelect: (chain: Chain) => void;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  availableChains?: Chain[];
 }
 
 export function SelectChain(props: Props) {
-  const { selectedChain, onSelect, isOpen, onOpenChange } = props;
+  const {
+    selectedChain,
+    onSelect,
+    isOpen,
+    onOpenChange,
+    availableChains = jbChains,
+  } = props;
   const { name, nativeCurrency, id } = selectedChain;
 
   return (
@@ -45,7 +56,7 @@ export function SelectChain(props: Props) {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-4">
         <div className="space-y-1">
-          {jbChains.map((chain) => (
+          {availableChains.map((chain) => (
             <button
               type="button"
               key={chain.id}

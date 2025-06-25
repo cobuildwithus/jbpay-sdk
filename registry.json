@@ -8,7 +8,14 @@
       "type": "registry:component",
       "title": "Pay Project Form",
       "description": "A form to pay a project",
-      "registryDependencies": ["card", "input", "button", "label", "popover", "dialog"],
+      "registryDependencies": [
+        "card",
+        "input",
+        "button",
+        "label",
+        "popover",
+        "dialog"
+      ],
       "dependencies": ["wagmi", "@tanstack/react-query", "viem"],
       "files": [
         {
@@ -44,7 +51,7 @@
           "type": "registry:lib"
         },
         {
-          "path": "registry/juicebox/pay-project-form/hooks/use-project.ts",
+          "path": "registry/juicebox/pay-project-form/hooks/use-projects.ts",
           "type": "registry:hook"
         },
         {
