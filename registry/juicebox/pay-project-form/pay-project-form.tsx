@@ -10,18 +10,19 @@ import { SelectChain } from "@/registry/juicebox/pay-project-form/components/sel
 import { useProjects } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
+import { formatProjectInput, parseProjectInput } from "@/lib/chains";
 import { useEffect, useMemo, useState } from "react";
 import { Chain, formatEther } from "viem";
-import { mainnet } from "viem/chains";
+import { mainnet, base } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
+import Image from "next/image";
+import revnetIcon from "./revnet.svg";
 
 // Optional environment variables
 const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
 const DEFAULT_CHAIN_ID = process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID;
 
 export function PayProjectForm() {
-  const [projectId, setProjectId] = useState(HARDCODED_PROJECT_ID || "");
-
   // Find the default chain or use the first available chain
   const defaultChain = useMemo(() => {
     if (DEFAULT_CHAIN_ID) {
@@ -29,14 +30,30 @@ export function PayProjectForm() {
       const foundChain = jbChains.find((chain) => chain.id === chainId);
       if (foundChain) return foundChain;
     }
-    return jbChains[0];
+    return base; // Default to base
   }, []);
 
+  // Initialize states
+  const [projectId, setProjectId] = useState(HARDCODED_PROJECT_ID || "3");
   const [selectedChain, setSelectedChain] = useState<Chain>(defaultChain);
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChainPopover, setShowChainPopover] = useState(false);
   const [showConnectButton, setShowConnectButton] = useState(true);
+
+  // Derive the project input from state
+  const projectInput = useMemo(() => {
+    return formatProjectInput(selectedChain, projectId);
+  }, [selectedChain, projectId]);
+
+  // Handle project input changes
+  const handleProjectInputChange = (value: string) => {
+    const { chain, projectId: parsedProjectId } = parseProjectInput(value);
+    if (chain) {
+      setSelectedChain(chain);
+    }
+    setProjectId(parsedProjectId);
+  };
 
   const { isConnected, address } = useAccount();
   const { data: balance } = useBalance({ chainId: selectedChain.id, address });
@@ -83,17 +100,26 @@ export function PayProjectForm() {
             <div className="space-y-2">
               <div className="flex justify-between space-x-2.5">
                 <Label htmlFor="projectId" className="text-sm font-medium">
-                  Project ID
+                  Project
                 </Label>
-                <span className="text-xs text-muted-foreground truncate">
+                <span className="text-xs text-muted-foreground truncate flex items-center gap-1">
                   {project?.name}
+                  {project?.isRevnet && (
+                    <Image
+                      src={revnetIcon}
+                      alt="Revnet"
+                      width={16}
+                      height={16}
+                      className="inline-block"
+                    />
+                  )}
                 </span>
               </div>
               <Input
                 id="projectId"
-                placeholder="Enter project ID"
-                value={projectId}
-                onChange={(e) => setProjectId(e.target.value)}
+                placeholder="chain:projectId (e.g. base:3)"
+                value={projectInput}
+                onChange={(e) => handleProjectInputChange(e.target.value)}
                 className="h-12"
               />
             </div>

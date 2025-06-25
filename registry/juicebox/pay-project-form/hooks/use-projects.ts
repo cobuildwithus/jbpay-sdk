@@ -18,6 +18,7 @@ export interface Project {
     disclosure: string;
   };
   suckerGroupId: string;
+  isRevnet: boolean;
 }
 
 export const useProjects = (args: {
