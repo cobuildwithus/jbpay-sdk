@@ -195,7 +195,7 @@ NEXT_PUBLIC_INFURA_ID=your_infura_project_id`}</code>
               <code className="bg-muted px-2 py-1 rounded">app/page.tsx</code>:
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-              <code className="language-typescript">{`import { PayProjectForm } from "@/registry/juicebox/pay-project-form/pay-project-form";
+              <code className="language-typescript">{`import { PayProjectForm } from "@/components/pay-project-form";
 
 export default function Home() {
   return (
@@ -283,7 +283,7 @@ export default function Home() {
             </Link>{" "}
             for more details, or visit the{" "}
             <Link
-              href="https://github.com/jbx-protocol/jbpay-sdk"
+              href="https://github.com/cobuildwithus/jbpay-sdk"
               className="underline"
               target="_blank"
             >
