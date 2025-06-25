@@ -50,7 +50,6 @@ export function PayProjectForm() {
   // Get the project for the selected chain
   const project = useMemo(() => {
     if (!projects || projects.length === 0) return null;
-    console.log(projects);
     return projects.find((p) => p.chainId === selectedChain.id) || null;
   }, [projects, selectedChain.id]);
 
