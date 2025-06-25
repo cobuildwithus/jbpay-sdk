@@ -14,7 +14,7 @@ export type ChainShortcut = keyof typeof CHAIN_SHORTCUTS;
 // Reverse mapping for getting shortcut from chain
 export const getChainShortcut = (chain: Chain): ChainShortcut | null => {
   const entry = Object.entries(CHAIN_SHORTCUTS).find(
-    ([_, c]) => c.id === chain.id
+    ([, c]) => c.id === chain.id
   );
   return entry ? (entry[0] as ChainShortcut) : null;
 };
