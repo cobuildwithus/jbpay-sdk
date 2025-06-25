@@ -15,8 +15,11 @@ import { Chain, formatEther } from "viem";
 import { mainnet } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
 
+// Optional environment variable to hardcode project ID
+const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
+
 export function PayProjectForm() {
-  const [projectId, setProjectId] = useState("");
+  const [projectId, setProjectId] = useState(HARDCODED_PROJECT_ID || "");
   const [selectedChain, setSelectedChain] = useState<Chain>(jbChains[0]);
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -26,7 +29,10 @@ export function PayProjectForm() {
   const { isConnected, address } = useAccount();
   const { data: balance } = useBalance({ chainId: selectedChain.id, address });
 
-  const { data: project } = useProject({ chainId: selectedChain.id, projectId });
+  const { data: project } = useProject({
+    chainId: selectedChain.id,
+    projectId,
+  });
 
   useEffect(() => {
     setShowConnectButton(!isConnected);
@@ -36,21 +42,25 @@ export function PayProjectForm() {
     <>
       <Card className="w-full max-w-md">
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex justify-between space-x-2.5">
-              <Label htmlFor="projectId" className="text-sm font-medium">
-                Project ID
-              </Label>
-              <span className="text-xs text-muted-foreground truncate">{project?.name}</span>
+          {!HARDCODED_PROJECT_ID && (
+            <div className="space-y-2">
+              <div className="flex justify-between space-x-2.5">
+                <Label htmlFor="projectId" className="text-sm font-medium">
+                  Project ID
+                </Label>
+                <span className="text-xs text-muted-foreground truncate">
+                  {project?.name}
+                </span>
+              </div>
+              <Input
+                id="projectId"
+                placeholder="Enter project ID"
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+                className="h-12"
+              />
             </div>
-            <Input
-              id="projectId"
-              placeholder="Enter project ID"
-              value={projectId}
-              onChange={(e) => setProjectId(e.target.value)}
-              className="h-12"
-            />
-          </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="amount" className="text-sm font-medium">
@@ -84,7 +94,8 @@ export function PayProjectForm() {
                   size="sm"
                   onClick={() => {
                     const amount = Number(formatEther(balance?.value ?? 0n));
-                    const gasBuffer = selectedChain.id === mainnet.id ? 0.01 : 0.0025;
+                    const gasBuffer =
+                      selectedChain.id === mainnet.id ? 0.001 : 0.000025;
                     setAmount(Math.max(amount - gasBuffer, 0).toFixed(5));
                   }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 px-2 text-xs font-medium text-primary hover:text-primary/90 bg-primary/10 hover:bg-primary/20"
@@ -96,7 +107,10 @@ export function PayProjectForm() {
           </div>
 
           {showConnectButton ? (
-            <ConnectButton className="w-full h-12 text-lg font-medium" size="lg" />
+            <ConnectButton
+              className="w-full h-12 text-lg font-medium"
+              size="lg"
+            />
           ) : (
             <Button
               type="button"
@@ -111,10 +125,13 @@ export function PayProjectForm() {
 
           <div
             className={`text-center text-sm text-muted-foreground transition-opacity duration-300 -mt-2.5 ${
-              project && amount && Number.parseFloat(amount) > 0 ? "opacity-100" : "opacity-0"
+              project && amount && Number.parseFloat(amount) > 0
+                ? "opacity-100"
+                : "opacity-0"
             }`}
           >
-            You'll receive ~{calculateTokensFromEth(amount, project?.token.price || "0")}{" "}
+            You'll receive ~
+            {calculateTokensFromEth(amount, project?.token.price || "0")}{" "}
             {project?.token.symbol}
           </div>
         </CardContent>

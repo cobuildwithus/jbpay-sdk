@@ -33,6 +33,20 @@ Where:
 
 Components support both light and dark themes using Tailwind CSS's dark mode feature. Make sure to add the `dark` class to your HTML head element for dark mode support.
 
+## Configuration
+
+### Environment Variables
+
+The pay-project-form component supports the following optional environment variable:
+
+- `NEXT_PUBLIC_PROJECT_ID` - When set, this will hide the project ID input field and hardcode the form to use the specified project ID.
+
+Example:
+
+```env
+NEXT_PUBLIC_PROJECT_ID=123
+```
+
 ## Development
 
 - Follow all recomenndation from the official shadcn Registry documentation.
