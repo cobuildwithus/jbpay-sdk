@@ -1,4 +1,4 @@
-# JB Pay SDK
+# JuicePay SDK
 
 UI components registry for Juicebox projects. It distributes custom components, hooks, pages, and other files to any React project.
 
@@ -6,7 +6,7 @@ Built using the [shadcn Registry](https://ui.shadcn.com/docs/registry) architect
 
 ## Using components
 
-You can use JB Pay SDK components in any React project.
+You can use JuicePay SDK components in any React project.
 
 ### Requirements
 

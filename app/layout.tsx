@@ -6,7 +6,7 @@ import { PropsWithChildren } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "JB Pay SDK",
+  title: "JuicePay SDK",
   description: "Custom UI components for Juicebox Projects",
 };
 
