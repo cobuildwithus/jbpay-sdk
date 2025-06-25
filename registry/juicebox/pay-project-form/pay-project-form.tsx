@@ -41,19 +41,30 @@ export function PayProjectForm() {
   const [showChainPopover, setShowChainPopover] = useState(false);
   const [showConnectButton, setShowConnectButton] = useState(true);
 
-  // Derive the project input from state
-  const projectInput = useMemo(() => {
-    return formatProjectInput(selectedChain, projectId);
-  }, [selectedChain, projectId]);
+  // Track the input value separately to allow free editing
+  const [inputValue, setInputValue] = useState(() =>
+    formatProjectInput(selectedChain, projectId)
+  );
 
   // Handle project input changes
   const handleProjectInputChange = (value: string) => {
+    setInputValue(value);
     const { chain, projectId: parsedProjectId } = parseProjectInput(value);
-    if (chain) {
+
+    // Only update if we have a valid chain and projectId
+    if (chain && parsedProjectId) {
       setSelectedChain(chain);
+      setProjectId(parsedProjectId);
     }
-    setProjectId(parsedProjectId);
   };
+
+  // Update input when chain changes from dropdown
+  useEffect(() => {
+    if (projectId) {
+      const formatted = formatProjectInput(selectedChain, projectId);
+      setInputValue(formatted);
+    }
+  }, [selectedChain, projectId]);
 
   const { isConnected, address } = useAccount();
   const { data: balance } = useBalance({ chainId: selectedChain.id, address });
@@ -118,7 +129,7 @@ export function PayProjectForm() {
               <Input
                 id="projectId"
                 placeholder="chain:projectId (e.g. base:3)"
-                value={projectInput}
+                value={inputValue}
                 onChange={(e) => handleProjectInputChange(e.target.value)}
                 className="h-12"
               />
