@@ -27,13 +27,13 @@ pnpm dev`}</code>
             </pre>
             <p className="mt-4 text-sm text-muted-foreground">
               When prompted, we recommend:
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>TypeScript: Yes</li>
-                <li>ESLint: Yes</li>
-                <li>Tailwind CSS: Yes</li>
-                <li>App Router: Yes</li>
-              </ul>
             </p>
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>TypeScript: Yes</li>
+              <li>ESLint: Yes</li>
+              <li>Tailwind CSS: Yes</li>
+              <li>App Router: Yes</li>
+            </ul>
           </CardContent>
         </Card>
 
@@ -237,8 +237,8 @@ export default function Home() {
                 <h4 className="font-semibold mb-2">Custom Themes</h4>
                 <p className="text-sm text-muted-foreground">
                   The component uses standard shadcn CSS variables, so it will
-                  automatically match any custom theme you've configured. Visit
-                  the{" "}
+                  automatically match any custom theme you&apos;ve configured.
+                  Visit the{" "}
                   <Link
                     href="https://ui.shadcn.com/themes"
                     className="underline"
@@ -256,7 +256,7 @@ export default function Home() {
         <Card className="border-green-500/20 bg-green-500/5">
           <CardHeader>
             <CardTitle className="text-green-700 dark:text-green-400">
-              🎉 That's it!
+              🎉 That&apos;s it!
             </CardTitle>
           </CardHeader>
           <CardContent>
