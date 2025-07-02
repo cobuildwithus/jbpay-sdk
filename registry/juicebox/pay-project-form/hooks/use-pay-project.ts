@@ -14,6 +14,7 @@ import {
   ETH_ADDRESS,
   JBMULTITERMINAL_ADDRESS,
 } from "@/registry/juicebox/pay-project-form/lib/chains";
+import { usePrimaryNativeTerminal } from "./use-primary-terminal";
 
 interface Args {
   projectId: bigint;
@@ -23,16 +24,28 @@ interface Args {
   minReturnedTokens?: bigint;
 }
 
-export type Status = "idle" | "connecting" | "pending" | "confirming" | "success" | "error";
+export type Status =
+  | "idle"
+  | "connecting"
+  | "pending"
+  | "confirming"
+  | "success"
+  | "error";
 
-export function usePayProject(chainId: number) {
+export function usePayProject(chainId: number, projectId: bigint) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const { chainId: connectedChainId, isConnected, address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
+  const { data: primaryTerminal } = usePrimaryNativeTerminal(
+    chainId,
+    projectId
+  );
   const { data: hash, isPending, error, writeContract } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   useEffect(() => {
     if (isPending) {
@@ -83,7 +96,13 @@ export function usePayProject(chainId: number) {
         }
       }
 
-      const { projectId, token, amount, beneficiary, minReturnedTokens = 0n } = args;
+      const {
+        projectId,
+        token,
+        amount,
+        beneficiary,
+        minReturnedTokens = 0n,
+      } = args;
 
       const isETH = token === ETH_ADDRESS;
       const value = isETH ? parseEther(amount) : 0n;
@@ -93,16 +112,28 @@ export function usePayProject(chainId: number) {
       const metadata = "0x0" as `0x${string}`;
 
       writeContract({
-        address: JBMULTITERMINAL_ADDRESS,
+        address: primaryTerminal ?? JBMULTITERMINAL_ADDRESS,
         abi: jbMultiTerminalAbi,
         functionName: "pay",
-        args: [projectId, token, payAmount, beneficiary, minReturnedTokens, memo, metadata],
+        args: [
+          projectId,
+          token,
+          payAmount,
+          beneficiary,
+          minReturnedTokens,
+          memo,
+          metadata,
+        ],
         value,
       });
     } catch (e) {
       console.error(e);
       setStatus("error");
-      setErrorMessage(e instanceof Error ? e.message : (e as any).shortMessage || "Unknown error");
+      setErrorMessage(
+        e instanceof Error
+          ? e.message
+          : (e as any).shortMessage || "Unknown error"
+      );
     }
   };
 

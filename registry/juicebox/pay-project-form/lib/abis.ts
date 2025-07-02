@@ -80,7 +80,9 @@ export const jbMultiTerminalAbi = [
   },
   {
     type: "error",
-    inputs: [{ name: "hook", internalType: "contract IJBSplitHook", type: "address" }],
+    inputs: [
+      { name: "hook", internalType: "contract IJBSplitHook", type: "address" },
+    ],
     name: "JBMultiTerminal_SplitHookInvalid",
   },
   {
@@ -951,7 +953,9 @@ export const jbMultiTerminalAbi = [
     type: "function",
     inputs: [],
     name: "DIRECTORY",
-    outputs: [{ name: "", internalType: "contract IJBDirectory", type: "address" }],
+    outputs: [
+      { name: "", internalType: "contract IJBDirectory", type: "address" },
+    ],
     stateMutability: "view",
   },
   {
@@ -978,7 +982,9 @@ export const jbMultiTerminalAbi = [
     type: "function",
     inputs: [],
     name: "PERMISSIONS",
-    outputs: [{ name: "", internalType: "contract IJBPermissions", type: "address" }],
+    outputs: [
+      { name: "", internalType: "contract IJBPermissions", type: "address" },
+    ],
     stateMutability: "view",
   },
   {
@@ -992,35 +998,45 @@ export const jbMultiTerminalAbi = [
     type: "function",
     inputs: [],
     name: "PROJECTS",
-    outputs: [{ name: "", internalType: "contract IJBProjects", type: "address" }],
+    outputs: [
+      { name: "", internalType: "contract IJBProjects", type: "address" },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     inputs: [],
     name: "RULESETS",
-    outputs: [{ name: "", internalType: "contract IJBRulesets", type: "address" }],
+    outputs: [
+      { name: "", internalType: "contract IJBRulesets", type: "address" },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     inputs: [],
     name: "SPLITS",
-    outputs: [{ name: "", internalType: "contract IJBSplits", type: "address" }],
+    outputs: [
+      { name: "", internalType: "contract IJBSplits", type: "address" },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     inputs: [],
     name: "STORE",
-    outputs: [{ name: "", internalType: "contract IJBTerminalStore", type: "address" }],
+    outputs: [
+      { name: "", internalType: "contract IJBTerminalStore", type: "address" },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     inputs: [],
     name: "TOKENS",
-    outputs: [{ name: "", internalType: "contract IJBTokens", type: "address" }],
+    outputs: [
+      { name: "", internalType: "contract IJBTokens", type: "address" },
+    ],
     stateMutability: "view",
   },
   {
@@ -1107,7 +1123,9 @@ export const jbMultiTerminalAbi = [
       { name: "metadata", internalType: "bytes", type: "bytes" },
     ],
     name: "cashOutTokensOf",
-    outputs: [{ name: "reclaimAmount", internalType: "uint256", type: "uint256" }],
+    outputs: [
+      { name: "reclaimAmount", internalType: "uint256", type: "uint256" },
+    ],
     stateMutability: "nonpayable",
   },
   {
@@ -1165,7 +1183,9 @@ export const jbMultiTerminalAbi = [
       },
     ],
     name: "executePayout",
-    outputs: [{ name: "netPayoutAmount", internalType: "uint256", type: "uint256" }],
+    outputs: [
+      { name: "netPayoutAmount", internalType: "uint256", type: "uint256" },
+    ],
     stateMutability: "nonpayable",
   },
   {
@@ -1278,7 +1298,9 @@ export const jbMultiTerminalAbi = [
       { name: "minTokensPaidOut", internalType: "uint256", type: "uint256" },
     ],
     name: "sendPayoutsOf",
-    outputs: [{ name: "amountPaidOut", internalType: "uint256", type: "uint256" }],
+    outputs: [
+      { name: "amountPaidOut", internalType: "uint256", type: "uint256" },
+    ],
     stateMutability: "nonpayable",
   },
   {
@@ -1312,7 +1334,360 @@ export const jbMultiTerminalAbi = [
       { name: "memo", internalType: "string", type: "string" },
     ],
     name: "useAllowanceOf",
-    outputs: [{ name: "netAmountPaidOut", internalType: "uint256", type: "uint256" }],
+    outputs: [
+      { name: "netAmountPaidOut", internalType: "uint256", type: "uint256" },
+    ],
     stateMutability: "nonpayable",
+  },
+] as const;
+
+export const jbDirectoryAbi = [
+  {
+    inputs: [
+      {
+        internalType: "contract IJBPermissions",
+        name: "permissions",
+        type: "address",
+      },
+      {
+        internalType: "contract IJBProjects",
+        name: "projects",
+        type: "address",
+      },
+      { internalType: "address", name: "owner", type: "address" },
+    ],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IJBTerminal",
+        name: "terminal",
+        type: "address",
+      },
+    ],
+    name: "JBDirectory_DuplicateTerminals",
+    type: "error",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      { internalType: "uint256", name: "limit", type: "uint256" },
+    ],
+    name: "JBDirectory_InvalidProjectIdInDirectory",
+    type: "error",
+  },
+  { inputs: [], name: "JBDirectory_SetControllerNotAllowed", type: "error" },
+  { inputs: [], name: "JBDirectory_SetTerminalsNotAllowed", type: "error" },
+  {
+    inputs: [
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      { internalType: "address", name: "token", type: "address" },
+      {
+        internalType: "contract IJBTerminal",
+        name: "terminal",
+        type: "address",
+      },
+    ],
+    name: "JBDirectory_TokenNotAccepted",
+    type: "error",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "account", type: "address" },
+      { internalType: "address", name: "sender", type: "address" },
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      { internalType: "uint256", name: "permissionId", type: "uint256" },
+    ],
+    name: "JBPermissioned_Unauthorized",
+    type: "error",
+  },
+  {
+    inputs: [{ internalType: "address", name: "owner", type: "address" }],
+    name: "OwnableInvalidOwner",
+    type: "error",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "OwnableUnauthorizedAccount",
+    type: "error",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "projectId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "contract IJBTerminal",
+        name: "terminal",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "caller",
+        type: "address",
+      },
+    ],
+    name: "AddTerminal",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "projectId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "contract IERC165",
+        name: "controller",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "caller",
+        type: "address",
+      },
+    ],
+    name: "SetController",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "addr", type: "address" },
+      { indexed: true, internalType: "bool", name: "isAllowed", type: "bool" },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "caller",
+        type: "address",
+      },
+    ],
+    name: "SetIsAllowedToSetFirstController",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "projectId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "contract IJBTerminal",
+        name: "terminal",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "caller",
+        type: "address",
+      },
+    ],
+    name: "SetPrimaryTerminal",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "projectId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "contract IJBTerminal[]",
+        name: "terminals",
+        type: "address[]",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "caller",
+        type: "address",
+      },
+    ],
+    name: "SetTerminals",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "PERMISSIONS",
+    outputs: [
+      { internalType: "contract IJBPermissions", name: "", type: "address" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "PROJECTS",
+    outputs: [
+      { internalType: "contract IJBProjects", name: "", type: "address" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "projectId", type: "uint256" }],
+    name: "controllerOf",
+    outputs: [{ internalType: "contract IERC165", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "addr", type: "address" }],
+    name: "isAllowedToSetFirstController",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      {
+        internalType: "contract IJBTerminal",
+        name: "terminal",
+        type: "address",
+      },
+    ],
+    name: "isTerminalOf",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      { internalType: "address", name: "token", type: "address" },
+    ],
+    name: "primaryTerminalOf",
+    outputs: [
+      { internalType: "contract IJBTerminal", name: "", type: "address" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      { internalType: "contract IERC165", name: "controller", type: "address" },
+    ],
+    name: "setControllerOf",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "addr", type: "address" },
+      { internalType: "bool", name: "flag", type: "bool" },
+    ],
+    name: "setIsAllowedToSetFirstController",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      { internalType: "address", name: "token", type: "address" },
+      {
+        internalType: "contract IJBTerminal",
+        name: "terminal",
+        type: "address",
+      },
+    ],
+    name: "setPrimaryTerminalOf",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "projectId", type: "uint256" },
+      {
+        internalType: "contract IJBTerminal[]",
+        name: "terminals",
+        type: "address[]",
+      },
+    ],
+    name: "setTerminalsOf",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "projectId", type: "uint256" }],
+    name: "terminalsOf",
+    outputs: [
+      { internalType: "contract IJBTerminal[]", name: "", type: "address[]" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
 ] as const;

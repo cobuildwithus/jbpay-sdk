@@ -31,7 +31,10 @@ interface Props {
 
 export function TransactionConfirmationModal(props: Props) {
   const { isOpen, onOpenChange, amount, project, chain } = props;
-  const { payProject, errorMessage, status, reset } = usePayProject(chain.id);
+  const { payProject, errorMessage, status, reset } = usePayProject(
+    chain.id,
+    BigInt(project.projectId)
+  );
   const { address } = useAccount();
 
   const closeModal = () => {
