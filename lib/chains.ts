@@ -1,12 +1,24 @@
 import { Chain } from "viem";
-import { mainnet, base, optimism, arbitrum } from "viem/chains";
+import {
+  mainnet,
+  base,
+  optimism,
+  arbitrum,
+  baseSepolia,
+  optimismSepolia,
+  sepolia,
+  arbitrumSepolia,
+} from "viem/chains";
 
-// Chain shortcut mappings
 export const CHAIN_SHORTCUTS = {
   eth: mainnet,
   base: base,
   op: optimism,
   arb: arbitrum,
+  sep: sepolia,
+  opsep: optimismSepolia,
+  basesep: baseSepolia,
+  arbsep: arbitrumSepolia,
 } as const;
 
 export type ChainShortcut = keyof typeof CHAIN_SHORTCUTS;

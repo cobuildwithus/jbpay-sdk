@@ -1,10 +1,24 @@
-import { arbitrum, base, Chain, mainnet, optimism } from "viem/chains";
+import {
+  arbitrum,
+  base,
+  Chain,
+  mainnet,
+  optimism,
+  baseSepolia,
+  sepolia,
+  optimismSepolia,
+  arbitrumSepolia,
+} from "viem/chains";
 
 export const jbChains = [
   base,
   mainnet,
   optimism,
   arbitrum,
+  baseSepolia,
+  sepolia,
+  optimismSepolia,
+  arbitrumSepolia,
 ] as const satisfies Chain[];
 
 export const JBMULTITERMINAL_ADDRESS =
