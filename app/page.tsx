@@ -20,7 +20,7 @@ export default function Home() {
             <Button>Get Started →</Button>
           </Link>
           <Link
-            href="https://github.com/jbx-protocol/jbpay-sdk"
+            href="https://github.com/cobuildwithus/jbpay-sdk"
             target="_blank"
             rel="noopener noreferrer"
           >

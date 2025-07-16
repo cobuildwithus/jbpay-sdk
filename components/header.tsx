@@ -54,7 +54,7 @@ export function Header() {
                   Quickstart
                 </Link>
                 <Link
-                  href="https://github.com/jbx-protocol/jbpay-sdk"
+                  href="https://github.com/cobuildwithus/jbpay-sdk"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium px-2 py-1.5 rounded-md transition-colors hover:bg-accent"

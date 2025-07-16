@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { parseEther } from "viem";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import {
-  useAccount,
-  useSwitchChain,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-  type BaseError,
-} from "wagmi";
-import { jbMultiTerminalAbi } from "@/registry/juicebox/pay-project-form/lib/abis";
+  jbMultiTerminalAbi,
+  jbSwapTerminalAbi,
+} from "@/registry/juicebox/pay-project-form/lib/abis";
 import {
   ETH_ADDRESS,
   JBMULTITERMINAL_ADDRESS,
+  JBSWAPTERMINAL_ADDRESS,
+  type Currency,
 } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { usePrimaryNativeTerminal } from "./use-primary-terminal";
+import { useTokenAllowance } from "./use-token-allowance";
+import { useNormalizeAmount } from "./use-normalize-amount";
+import { usePrepareWallet } from "./use-prepare-wallet";
+import { useTransactionStatus } from "./use-transaction-status";
 
 interface Args {
   projectId: bigint;
@@ -22,22 +24,11 @@ interface Args {
   amount: string;
   beneficiary: `0x${string}`;
   minReturnedTokens?: bigint;
+  currency: Currency;
 }
 
-export type Status =
-  | "idle"
-  | "connecting"
-  | "pending"
-  | "confirming"
-  | "success"
-  | "error";
-
 export function usePayProject(chainId: number, projectId: bigint) {
-  const [status, setStatus] = useState<Status>("idle");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-
-  const { chainId: connectedChainId, isConnected, address } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
+  const { prepareWallet } = usePrepareWallet();
   const { data: primaryTerminal } = usePrimaryNativeTerminal(
     chainId,
     projectId
@@ -47,53 +38,52 @@ export function usePayProject(chainId: number, projectId: bigint) {
     hash,
   });
 
-  useEffect(() => {
-    if (isPending) {
-      setStatus("pending");
-      return;
-    }
+  // Use helper hooks
+  const {
+    checkAllowance,
+    approveToken,
+    needsApproval,
+    setNeedsApproval,
+    approvalHash,
+    isApprovalPending,
+    isApprovalConfirming,
+    isApprovalSuccess,
+    approvalError,
+  } = useTokenAllowance(chainId);
+  const { normalizeAmount } = useNormalizeAmount(chainId);
 
-    if (isConfirming && hash) {
-      setStatus("confirming");
-      return;
-    }
-
-    if (isSuccess && hash) {
-      setStatus("success");
-      return;
-    }
-
-    if (error) {
-      setStatus("error");
-      setErrorMessage((error as BaseError).shortMessage || error.message);
-    }
-  }, [isPending, isConfirming, isSuccess, hash, error]);
+  // Use transaction status hook
+  const {
+    status,
+    errorMessage,
+    setStatus,
+    setErrorMessage,
+    reset: resetStatus,
+  } = useTransactionStatus({
+    isPending,
+    isConfirming,
+    isSuccess,
+    hash,
+    error: error || undefined,
+    isApprovalPending,
+    isApprovalConfirming,
+    isApprovalSuccess,
+    approvalHash,
+    approvalError: approvalError || undefined,
+    onApprovalSuccess: () => setNeedsApproval(false),
+  });
 
   const payProject = async (args: Args) => {
     try {
       setStatus("connecting");
       setErrorMessage("");
 
-      if (!isConnected) {
+      // Prepare wallet and switch chain if needed
+      const walletResult = await prepareWallet(chainId);
+      if (!walletResult.success) {
         setStatus("error");
-        setErrorMessage("Wallet not connected");
+        setErrorMessage(walletResult.error);
         return;
-      }
-
-      if (!address) {
-        setStatus("error");
-        setErrorMessage("No wallet address found");
-        return;
-      }
-
-      if (chainId !== connectedChainId) {
-        try {
-          await switchChainAsync({ chainId });
-        } catch (e) {
-          setStatus("error");
-          setErrorMessage(`Please switch to network ${chainId}`);
-          return;
-        }
       }
 
       const {
@@ -102,30 +92,74 @@ export function usePayProject(chainId: number, projectId: bigint) {
         amount,
         beneficiary,
         minReturnedTokens = 0n,
+        currency,
       } = args;
 
-      const isETH = token === ETH_ADDRESS;
-      const value = isETH ? parseEther(amount) : 0n;
-      const payAmount = isETH ? value : parseEther(amount);
-
+      const isETH = currency.isNative;
       const memo = "";
       const metadata = "0x0" as `0x${string}`;
 
-      writeContract({
-        address: primaryTerminal ?? JBMULTITERMINAL_ADDRESS,
-        abi: jbMultiTerminalAbi,
-        functionName: "pay",
-        args: [
-          projectId,
-          token,
-          payAmount,
-          beneficiary,
-          minReturnedTokens,
-          memo,
-          metadata,
-        ],
-        value,
-      });
+      // Check allowance for ERC20 tokens
+      if (!isETH) {
+        const hasAllowance = await checkAllowance(token, amount, isETH);
+        if (!hasAllowance) {
+          setNeedsApproval(true);
+          setStatus("error");
+          setErrorMessage("Token approval required");
+          return;
+        }
+      }
+
+      if (isETH) {
+        // Native token payment through multi-terminal
+        const value = parseEther(amount);
+
+        writeContract({
+          address: primaryTerminal ?? JBMULTITERMINAL_ADDRESS,
+          abi: jbMultiTerminalAbi,
+          functionName: "pay",
+          args: [
+            projectId,
+            ETH_ADDRESS,
+            value,
+            beneficiary,
+            minReturnedTokens,
+            memo,
+            metadata,
+          ],
+          value,
+          chainId,
+        });
+      } else {
+        // ERC20 token payment through swap terminal
+        const swapTerminal = JBSWAPTERMINAL_ADDRESS[chainId];
+
+        if (!swapTerminal) {
+          setStatus("error");
+          setErrorMessage("Swap terminal not available on this network");
+          return;
+        }
+
+        // Normalize amount based on token decimals
+        const payAmount = await normalizeAmount(amount, currency);
+
+        writeContract({
+          address: swapTerminal,
+          abi: jbSwapTerminalAbi,
+          functionName: "pay",
+          args: [
+            projectId,
+            token,
+            payAmount,
+            beneficiary,
+            minReturnedTokens,
+            memo,
+            metadata,
+          ],
+          value: 0n,
+          chainId,
+        });
+      }
     } catch (e) {
       console.error(e);
       setStatus("error");
@@ -137,14 +171,41 @@ export function usePayProject(chainId: number, projectId: bigint) {
     }
   };
 
+  const handleApproveToken = async (token: `0x${string}`, amount: string) => {
+    try {
+      setStatus("connecting");
+      setErrorMessage("");
+
+      // Prepare wallet and switch chain if needed
+      const walletResult = await prepareWallet(chainId);
+      if (!walletResult.success) {
+        setStatus("error");
+        setErrorMessage(walletResult.error);
+        return;
+      }
+
+      // The status will be automatically updated by the useTransactionStatus hook
+      await approveToken(token, amount);
+    } catch (e) {
+      setStatus("error");
+      setErrorMessage(
+        e instanceof Error ? e.message : "Failed to approve token"
+      );
+    }
+  };
+
   return {
     status,
     errorMessage,
     hash,
+    approvalHash,
     payProject,
+    approveToken: handleApproveToken,
+    checkAllowance,
+    needsApproval,
     reset: () => {
-      setStatus("idle");
-      setErrorMessage("");
+      resetStatus();
+      setNeedsApproval(false);
     },
   };
 }

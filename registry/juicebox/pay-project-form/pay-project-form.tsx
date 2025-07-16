@@ -6,9 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";
 import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
-import { SelectChain } from "@/registry/juicebox/pay-project-form/components/select-chain";
+import { SelectCurrency } from "@/registry/juicebox/pay-project-form/components/select-currency";
 import { useProjects } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
-import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
+import {
+  jbChains,
+  ETH_ADDRESS,
+  type Currency,
+} from "@/registry/juicebox/pay-project-form/lib/chains";
 import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
 import { formatProjectInput, parseProjectInput } from "@/lib/chains";
 import { useEffect, useMemo, useState } from "react";
@@ -36,6 +40,11 @@ export function PayProjectForm() {
   // Initialize states
   const [projectId, setProjectId] = useState(HARDCODED_PROJECT_ID || "3");
   const [selectedChain, setSelectedChain] = useState<Chain>(defaultChain);
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>({
+    symbol: defaultChain.nativeCurrency.symbol,
+    address: ETH_ADDRESS,
+    isNative: true,
+  });
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChainPopover, setShowChainPopover] = useState(false);
@@ -66,8 +75,21 @@ export function PayProjectForm() {
     }
   }, [selectedChain, projectId]);
 
+  // Reset currency to native when chain changes
+  useEffect(() => {
+    setSelectedCurrency({
+      symbol: selectedChain.nativeCurrency.symbol,
+      address: ETH_ADDRESS,
+      isNative: true,
+    });
+  }, [selectedChain]);
+
   const { isConnected, address } = useAccount();
-  const { data: balance } = useBalance({ chainId: selectedChain.id, address });
+  const { data: balance } = useBalance({
+    chainId: selectedChain.id,
+    address,
+    token: selectedCurrency.isNative ? undefined : selectedCurrency.address,
+  });
 
   // Fetch projects - only fires if both chainId and projectId are set
   const { data: projects } = useProjects({
@@ -141,11 +163,14 @@ export function PayProjectForm() {
               You Pay
             </Label>
             <div className="border border-border rounded-lg p-2 space-y-3">
-              <SelectChain
+              <SelectCurrency
                 selectedChain={selectedChain}
-                onSelect={(chain) => {
+                selectedCurrency={selectedCurrency}
+                onSelectChain={(chain) => {
                   setSelectedChain(chain);
-                  setShowChainPopover(false);
+                }}
+                onSelectCurrency={(currency) => {
+                  setSelectedCurrency(currency);
                 }}
                 isOpen={showChainPopover}
                 onOpenChange={setShowChainPopover}
@@ -162,16 +187,22 @@ export function PayProjectForm() {
                   type="number"
                   step="0.001"
                   min={0}
+                  autoComplete="off"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    const amount = Number(formatEther(balance?.value ?? 0n));
-                    const gasBuffer =
-                      selectedChain.id === mainnet.id ? 0.001 : 0.000025;
-                    setAmount(Math.max(amount - gasBuffer, 0).toFixed(5));
+                    if (selectedCurrency.isNative) {
+                      const amount = Number(formatEther(balance?.value ?? 0n));
+                      const gasBuffer =
+                        selectedChain.id === mainnet.id ? 0.001 : 0.000025;
+                      setAmount(Math.max(amount - gasBuffer, 0).toFixed(5));
+                    } else {
+                      // For ERC20 tokens, use the full balance
+                      setAmount(balance?.formatted ?? "0");
+                    }
                   }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 px-2 text-xs font-medium text-primary hover:text-primary/90 bg-primary/10 hover:bg-primary/20"
                 >
@@ -194,7 +225,7 @@ export function PayProjectForm() {
               className="w-full h-12 text-lg font-medium"
               size="lg"
             >
-              Pay {amount || "0"} {selectedChain.nativeCurrency.symbol}
+              Pay {amount || "0"} {selectedCurrency.symbol}
             </Button>
           )}
 
@@ -219,6 +250,7 @@ export function PayProjectForm() {
           amount={amount}
           chain={selectedChain}
           project={project}
+          currency={selectedCurrency}
         />
       )}
     </>

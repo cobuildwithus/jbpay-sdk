@@ -12,14 +12,13 @@ import {
 import { cn } from "@/lib/utils";
 import { Chain } from "viem";
 import { useAccount } from "wagmi";
-import {
-  Status,
-  usePayProject,
-} from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
+import { usePayProject } from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
 import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
-import { ETH_ADDRESS } from "@/registry/juicebox/pay-project-form/lib/chains";
+import { type Currency } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
 import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
+import { useState, useEffect } from "react";
+import { Status } from "../hooks/use-transaction-status";
 
 interface Props {
   isOpen: boolean;
@@ -27,18 +26,53 @@ interface Props {
   amount: string;
   project: Project;
   chain: Chain;
+  currency: Currency;
 }
 
 export function TransactionConfirmationModal(props: Props) {
-  const { isOpen, onOpenChange, amount, project, chain } = props;
-  const { payProject, errorMessage, status, reset } = usePayProject(
-    chain.id,
-    BigInt(project.projectId)
-  );
+  const { isOpen, onOpenChange, amount, project, chain, currency } = props;
+  const {
+    payProject,
+    approveToken,
+    checkAllowance,
+    errorMessage,
+    status,
+    reset,
+  } = usePayProject(chain.id, BigInt(project.projectId));
   const { address } = useAccount();
+  const [requiresApproval, setRequiresApproval] = useState(false);
+
+  // Check allowance when modal opens or currency changes
+  useEffect(() => {
+    if (isOpen && !currency.isNative && address) {
+      checkAllowance(currency.address, amount, currency.isNative).then(
+        (hasAllowance) => {
+          setRequiresApproval(!hasAllowance);
+        }
+      );
+    }
+  }, [isOpen, currency, amount, address, checkAllowance]);
+
+  // Recheck allowance after successful approval
+  useEffect(() => {
+    if (
+      status === "idle" &&
+      requiresApproval &&
+      !currency.isNative &&
+      address
+    ) {
+      // This will run after approval success when status returns to idle
+      checkAllowance(currency.address, amount, currency.isNative).then(
+        (hasAllowance) => {
+          setRequiresApproval(!hasAllowance);
+        }
+      );
+    }
+  }, [status, requiresApproval, currency, amount, address, checkAllowance]);
 
   const closeModal = () => {
     reset();
+    setRequiresApproval(false);
     onOpenChange(false);
   };
 
@@ -71,7 +105,7 @@ export function TransactionConfirmationModal(props: Props) {
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">You Pay:</span>
               <span className="text-lg font-medium">
-                {amount} {chain.nativeCurrency.symbol}
+                {amount} {currency.symbol}
               </span>
             </div>
             <div className="flex justify-between items-center mt-2">
@@ -108,19 +142,39 @@ export function TransactionConfirmationModal(props: Props) {
                 </ConnectButton>
               )}
               {address && (
-                <Button
-                  onClick={() => {
-                    payProject({
-                      projectId: BigInt(project.projectId),
-                      token: ETH_ADDRESS,
-                      amount,
-                      beneficiary: address,
-                    });
-                  }}
-                  className="flex-1"
-                >
-                  Confirm Payment
-                </Button>
+                <>
+                  {requiresApproval && !currency.isNative ? (
+                    <Button
+                      onClick={() => {
+                        approveToken(currency.address, amount);
+                      }}
+                      className="flex-1"
+                      disabled={status === "pending" || status === "confirming"}
+                    >
+                      {status === "pending" || status === "confirming"
+                        ? "Approving..."
+                        : `Approve ${currency.symbol}`}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        payProject({
+                          projectId: BigInt(project.projectId),
+                          token: currency.address,
+                          amount,
+                          beneficiary: address,
+                          currency,
+                        });
+                      }}
+                      className="flex-1"
+                      disabled={status === "pending" || status === "confirming"}
+                    >
+                      {status === "pending" || status === "confirming"
+                        ? "Processing..."
+                        : "Confirm Payment"}
+                    </Button>
+                  )}
+                </>
               )}
             </div>
             <div
