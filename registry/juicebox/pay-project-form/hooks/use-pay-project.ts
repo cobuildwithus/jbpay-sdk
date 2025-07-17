@@ -1,7 +1,12 @@
 "use client";
 
 import { parseEther } from "viem";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useState, useEffect } from "react";
+import {
+  useWaitForTransactionReceipt,
+  useWriteContract,
+  type BaseError,
+} from "wagmi";
 import {
   jbMultiTerminalAbi,
   jbSwapTerminalAbi,
@@ -16,7 +21,7 @@ import { usePrimaryNativeTerminal } from "./use-primary-terminal";
 import { useTokenAllowance } from "./use-token-allowance";
 import { useNormalizeAmount } from "./use-normalize-amount";
 import { usePrepareWallet } from "./use-prepare-wallet";
-import { useTransactionStatus } from "./use-transaction-status";
+import { Status } from "./use-transaction-status";
 
 interface Args {
   projectId: bigint;
@@ -28,6 +33,10 @@ interface Args {
 }
 
 export function usePayProject(chainId: number, projectId: bigint) {
+  // Local status & error handling
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   const { prepareWallet } = usePrepareWallet();
   const { data: primaryTerminal } = usePrimaryNativeTerminal(
     chainId,
@@ -38,40 +47,40 @@ export function usePayProject(chainId: number, projectId: bigint) {
     hash,
   });
 
-  // Use helper hooks
+  // Helper hooks
   const {
     checkAllowance,
     approveToken,
     needsApproval,
     setNeedsApproval,
     approvalHash,
-    isApprovalPending,
-    isApprovalConfirming,
-    isApprovalSuccess,
-    approvalError,
-  } = useTokenAllowance(chainId);
+  } = useTokenAllowance(chainId, { setStatus, setErrorMessage });
   const { normalizeAmount } = useNormalizeAmount(chainId);
 
-  // Use transaction status hook
-  const {
-    status,
-    errorMessage,
-    setStatus,
-    setErrorMessage,
-    reset: resetStatus,
-  } = useTransactionStatus({
-    isPending,
-    isConfirming,
-    isSuccess,
-    hash,
-    error: error || undefined,
-    isApprovalPending,
-    isApprovalConfirming,
-    isApprovalSuccess,
-    approvalHash,
-    approvalError: approvalError || undefined,
-    onApprovalSuccess: () => setNeedsApproval(false),
-  });
+  // Sync payment transaction state to status
+  useEffect(() => {
+    if (isPending) {
+      setStatus("pending");
+      return;
+    }
+
+    if (isConfirming && hash) {
+      setStatus("confirming");
+      return;
+    }
+
+    if (isSuccess && hash) {
+      setStatus("success");
+    }
+  }, [isPending, isConfirming, isSuccess, hash]);
+
+  // Handle payment transaction errors
+  useEffect(() => {
+    if (error) {
+      setStatus("error");
+      setErrorMessage((error as BaseError).shortMessage || error.message);
+    }
+  }, [error]);
 
   const payProject = async (args: Args) => {
     try {
@@ -204,7 +213,8 @@ export function usePayProject(chainId: number, projectId: bigint) {
     checkAllowance,
     needsApproval,
     reset: () => {
-      resetStatus();
+      setStatus("idle");
+      setErrorMessage("");
       setNeedsApproval(false);
     },
   };

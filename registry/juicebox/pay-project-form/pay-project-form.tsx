@@ -8,12 +8,12 @@ import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-fo
 import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
 import { SelectCurrency } from "@/registry/juicebox/pay-project-form/components/select-currency";
 import { useProjects } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
+import { useTokenQuote } from "@/registry/juicebox/pay-project-form/hooks/use-token-quote";
 import {
   jbChains,
   ETH_ADDRESS,
   type Currency,
 } from "@/registry/juicebox/pay-project-form/lib/chains";
-import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
 import { formatProjectInput, parseProjectInput } from "@/lib/chains";
 import { useEffect, useMemo, useState } from "react";
 import { Chain, formatEther } from "viem";
@@ -125,6 +125,15 @@ export function PayProjectForm() {
     }
   }, [availableChains, selectedChain]);
 
+  // Calculate token quote
+  const { quote: tokenQuote } = useTokenQuote({
+    chainId: selectedChain.id,
+    projectId: project?.projectId?.toString() || "0",
+    amount,
+    currency: selectedCurrency,
+    tokenPrice: project?.token.price || "0",
+  });
+
   return (
     <>
       <Card className="w-full max-w-md">
@@ -229,17 +238,17 @@ export function PayProjectForm() {
             </Button>
           )}
 
-          <div
-            className={`text-center text-sm text-muted-foreground transition-opacity duration-300 -mt-2.5 ${
-              project && amount && Number.parseFloat(amount) > 0
-                ? "opacity-100"
-                : "opacity-0"
-            }`}
-          >
-            You'll receive ~
-            {calculateTokensFromEth(amount, project?.token.price || "0")}{" "}
-            {project?.token.symbol}
-          </div>
+          {tokenQuote && (
+            <div
+              className={`text-center text-sm text-muted-foreground transition-opacity duration-300 -mt-2.5 ${
+                project && amount && Number.parseFloat(amount) > 0
+                  ? "opacity-100"
+                  : "opacity-0"
+              }`}
+            >
+              You'll receive ~{tokenQuote} {project?.token.symbol}
+            </div>
+          )}
         </CardContent>
       </Card>
 

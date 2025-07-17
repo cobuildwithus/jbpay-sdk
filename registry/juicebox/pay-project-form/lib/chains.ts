@@ -41,6 +41,10 @@ export const JBSWAPTERMINAL_ADDRESS: Record<number, `0x${string}`> = {
   [baseSepolia.id]: "0xb940f0bb31376cad3a0fae7c78995ae899160a52",
 } as const;
 
+// JBPrices contract (price oracle) - same address across chains
+export const JBPRICES_ADDRESS =
+  "0xe712d14b04f1a1fe464be930e3ea72b9b0a141d7" as const;
+
 // Supported tokens for swap terminal
 export const SUPPORTED_TOKENS: Record<number, Record<string, `0x${string}`>> = {
   // Ethereum Mainnet

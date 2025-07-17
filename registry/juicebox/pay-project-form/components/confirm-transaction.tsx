@@ -15,7 +15,7 @@ import { useAccount } from "wagmi";
 import { usePayProject } from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
 import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { type Currency } from "@/registry/juicebox/pay-project-form/lib/chains";
-import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
+import { useTokenQuote } from "@/registry/juicebox/pay-project-form/hooks/use-token-quote";
 import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
 import { useState, useEffect } from "react";
 import { Status } from "../hooks/use-transaction-status";
@@ -41,6 +41,15 @@ export function TransactionConfirmationModal(props: Props) {
   } = usePayProject(chain.id, BigInt(project.projectId));
   const { address } = useAccount();
   const [requiresApproval, setRequiresApproval] = useState(false);
+
+  // Quote tokens to receive
+  const { quote: tokenQuote } = useTokenQuote({
+    chainId: chain.id,
+    projectId: project.projectId.toString(),
+    amount,
+    currency,
+    tokenPrice: project.token.price,
+  });
 
   // Check allowance when modal opens or currency changes
   useEffect(() => {
@@ -108,15 +117,16 @@ export function TransactionConfirmationModal(props: Props) {
                 {amount} {currency.symbol}
               </span>
             </div>
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-sm text-muted-foreground">
-                You Receive:
-              </span>
-              <span className="text-lg font-medium">
-                ~{calculateTokensFromEth(amount, project.token.price)}{" "}
-                {project.token.symbol}
-              </span>
-            </div>
+            {tokenQuote && (
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-sm text-muted-foreground">
+                  You Receive:
+                </span>
+                <span className="text-lg font-medium">
+                  ~{tokenQuote} {project.token.symbol}
+                </span>
+              </div>
+            )}
           </div>
 
           {project.token.disclosure && project.token.disclosure.length > 0 && (
