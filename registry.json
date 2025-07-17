@@ -27,7 +27,7 @@
           "type": "registry:component"
         },
         {
-          "path": "registry/juicebox/pay-project-form/components/select-chain.tsx",
+          "path": "registry/juicebox/pay-project-form/components/select-currency.tsx",
           "type": "registry:component"
         },
         {
