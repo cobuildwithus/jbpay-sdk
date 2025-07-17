@@ -7,6 +7,7 @@ import {
 import { getClient } from "@/lib/client";
 import { jbPricesAbi } from "@/registry/juicebox/pay-project-form/lib/abis";
 import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
+import { getEthUsdRate } from "@/registry/juicebox/pay-project-form/lib/eth-price";
 
 interface Params {
   chainId: number;
@@ -79,6 +80,16 @@ export function useTokenQuote({
         if (!cancelled) setQuote(q);
       } catch (err) {
         console.error("Failed to fetch quote:", err);
+
+        // Fallback to public ETH-USD rate if available
+        const ethUsd = await getEthUsdRate();
+        if (ethUsd && ethUsd > 0) {
+          const ethAmount = parseFloat(amount) / ethUsd;
+          const q = calculateTokensFromEth(ethAmount.toString(), tokenPrice);
+          if (!cancelled) setQuote(q);
+          return;
+        }
+
         // graceful fallback
         if (!cancelled) setQuote("");
       } finally {
