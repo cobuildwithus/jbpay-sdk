@@ -47,7 +47,6 @@ export function PayProjectForm() {
   });
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showChainPopover, setShowChainPopover] = useState(false);
   const [showConnectButton, setShowConnectButton] = useState(true);
 
   // Track the input value separately to allow free editing
@@ -181,8 +180,6 @@ export function PayProjectForm() {
                 onSelectCurrency={(currency) => {
                   setSelectedCurrency(currency);
                 }}
-                isOpen={showChainPopover}
-                onOpenChange={setShowChainPopover}
                 availableChains={availableChains}
               />
 

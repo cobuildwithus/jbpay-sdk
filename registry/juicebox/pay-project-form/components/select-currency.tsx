@@ -16,14 +16,13 @@ import {
 import { Chain } from "viem";
 import { useBalance } from "wagmi";
 import { useAccount } from "wagmi";
+import { useState } from "react";
 
 interface Props {
   selectedChain: Chain;
   selectedCurrency: Currency;
   onSelectChain: (chain: Chain) => void;
   onSelectCurrency: (currency: Currency) => void;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
   availableChains?: Chain[];
 }
 
@@ -66,10 +65,11 @@ export function SelectCurrency(props: Props) {
     selectedCurrency,
     onSelectChain,
     onSelectCurrency,
-    isOpen,
-    onOpenChange,
     availableChains = jbChains,
   } = props;
+
+  const [isChainOpen, setIsChainOpen] = useState(false);
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
 
   // Get available currencies for the selected chain
   const availableCurrencies: Currency[] = [
@@ -92,17 +92,18 @@ export function SelectCurrency(props: Props) {
   ];
 
   return (
-    <Popover open={isOpen} onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          className="w-full h-auto p-2 justify-between text-left font-normal hover:bg-transparent cursor-pointer"
-        >
-          <span className="text-sm text-muted-foreground">
-            on {selectedChain.name}
-          </span>
-          <div className="flex items-center gap-2">
-            <div className="text-sm font-medium">{selectedCurrency.symbol}</div>
+    <div className="flex w-full gap-2">
+      {/* Chain Selector */}
+      <Popover open={isChainOpen} onOpenChange={setIsChainOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            className="flex-1 h-auto p-2 justify-start text-left font-normal hover:bg-transparent cursor-pointer"
+            type="button"
+          >
+            <span className="text-sm text-muted-foreground truncate">
+              on {selectedChain.name}
+            </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="size-4 opacity-50"
@@ -115,49 +116,70 @@ export function SelectCurrency(props: Props) {
             >
               <path d="m6 9 6 6 6-6" />
             </svg>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-4 space-y-4">
+          <h4 className="text-sm font-medium mb-2">Chain</h4>
+          <div className="space-y-1">
+            {availableChains.map((chain) => (
+              <button
+                type="button"
+                key={chain.id}
+                onClick={() => {
+                  onSelectChain(chain);
+                  // Reset to native currency when changing chains
+                  onSelectCurrency({
+                    symbol: chain.nativeCurrency.symbol,
+                    address: ETH_ADDRESS,
+                    isNative: true,
+                  });
+                  setIsChainOpen(false);
+                }}
+                className={cn(
+                  "w-full flex items-center justify-between p-3 rounded-lg transition-colors",
+                  {
+                    "bg-accent": selectedChain.id === chain.id,
+                    "hover:bg-accent/75": selectedChain.id !== chain.id,
+                  }
+                )}
+              >
+                <div className="font-medium text-sm">{chain.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  <ChainBalance chainId={chain.id} />{" "}
+                  {chain.nativeCurrency.symbol}
+                </div>
+              </button>
+            ))}
           </div>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-4 space-y-4">
-        {/* Chain Selection */}
-        {availableChains.length > 1 && (
-          <div>
-            <h4 className="text-sm font-medium mb-2">Chain</h4>
-            <div className="space-y-1">
-              {availableChains.map((chain) => (
-                <button
-                  type="button"
-                  key={chain.id}
-                  onClick={() => {
-                    onSelectChain(chain);
-                    // Reset to native currency when changing chains
-                    onSelectCurrency({
-                      symbol: chain.nativeCurrency.symbol,
-                      address: ETH_ADDRESS,
-                      isNative: true,
-                    });
-                  }}
-                  className={cn(
-                    "w-full flex items-center justify-between p-3 rounded-lg transition-colors",
-                    {
-                      "bg-accent": selectedChain.id === chain.id,
-                      "hover:bg-accent/75": selectedChain.id !== chain.id,
-                    }
-                  )}
-                >
-                  <div className="font-medium text-sm">{chain.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    <ChainBalance chainId={chain.id} />{" "}
-                    {chain.nativeCurrency.symbol}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        </PopoverContent>
+      </Popover>
 
-        {/* Currency Selection */}
-        <div>
+      {/* Currency Selector */}
+      <Popover open={isCurrencyOpen} onOpenChange={setIsCurrencyOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            className="flex-1 h-auto p-2 justify-end text-right font-normal hover:bg-transparent cursor-pointer"
+            type="button"
+          >
+            <span className="text-sm font-medium truncate">
+              {selectedCurrency.symbol}
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="size-4 opacity-50"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-4 space-y-4">
           <h4 className="text-sm font-medium mb-2">Currency</h4>
           <div className="space-y-1">
             {availableCurrencies.map((currency) => (
@@ -166,7 +188,7 @@ export function SelectCurrency(props: Props) {
                 key={currency.address}
                 onClick={() => {
                   onSelectCurrency(currency);
-                  onOpenChange(false);
+                  setIsCurrencyOpen(false);
                 }}
                 className={cn(
                   "w-full flex items-center justify-between p-3 rounded-lg transition-colors",
@@ -188,8 +210,8 @@ export function SelectCurrency(props: Props) {
               </button>
             ))}
           </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
