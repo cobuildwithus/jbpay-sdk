@@ -221,7 +221,6 @@ export function usePayProject(
     reset: () => {
       setStatus("idle");
       setErrorMessage("");
-      setNeedsApproval(false);
     },
   };
 }
