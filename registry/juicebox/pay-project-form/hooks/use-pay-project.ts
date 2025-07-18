@@ -34,7 +34,11 @@ interface Args {
   accountingDecimals: number;
 }
 
-export function usePayProject(project: Project, amount: string) {
+export function usePayProject(
+  project: Project,
+  amount: string,
+  paymentToken: `0x${string}`
+) {
   const { chainId, projectId, accountingToken } = project;
   // Local status & error handling
   const [status, setStatus] = useState<Status>("idle");
@@ -44,7 +48,7 @@ export function usePayProject(project: Project, amount: string) {
   const { data: primaryTerminal } = usePrimaryTerminal(
     chainId,
     BigInt(projectId),
-    accountingToken
+    paymentToken
   );
 
   const { data: hash, isPending, error, writeContract } = useWriteContract();
@@ -122,16 +126,12 @@ export function usePayProject(project: Project, amount: string) {
       const hasPrimaryTerminal =
         !!primaryTerminal && primaryTerminal !== zeroAddress;
 
-      const terminalAddress = hasPrimaryTerminal
-        ? primaryTerminal
-        : JBMULTITERMINAL_ADDRESS;
-
-      if (isAccountingCurrency) {
+      if (hasPrimaryTerminal) {
         // Native token payment through multi-terminal
         const value = isPayingEth ? parseEther(amount) : 0n;
 
         writeContract({
-          address: terminalAddress,
+          address: primaryTerminal,
           abi: jbMultiTerminalAbi,
           functionName: "pay",
           args: [
@@ -147,6 +147,8 @@ export function usePayProject(project: Project, amount: string) {
           chainId,
         });
       } else {
+        // Try to fall back to the swap terminal
+
         // ERC20 token payment through swap terminal
         const swapTerminal = JBSWAPTERMINAL_ADDRESS[chainId];
 

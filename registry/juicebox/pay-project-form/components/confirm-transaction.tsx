@@ -38,7 +38,7 @@ export function TransactionConfirmationModal(props: Props) {
     status,
     reset,
     needsApproval,
-  } = usePayProject(project, amount);
+  } = usePayProject(project, amount, currency.address);
   const { address } = useAccount();
 
   // Quote tokens to receive
