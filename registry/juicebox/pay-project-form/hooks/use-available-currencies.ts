@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Chain } from "viem";
 import {
   ETH_ADDRESS,
+  FLOWS_ADDRESS,
   SUPPORTED_TOKENS,
   type Currency,
 } from "@/registry/juicebox/pay-project-form/lib/chains";
@@ -23,10 +24,23 @@ export function useAvailableCurrencies(
   return useMemo(() => {
     const currencies: Currency[] = [];
 
-    // Native currency is disabled only when we have project data and it differs
-    const disableNative = project
-      ? project.accountingToken.toLowerCase() !== ETH_ADDRESS.toLowerCase()
+    // Check if the project's accounting token is the FLOWS token
+    const isFlowsBacked = project
+      ? project.accountingToken.toLowerCase() === FLOWS_ADDRESS.toLowerCase()
       : false;
+
+    // Disable native currency if the project's accounting token is not ETH
+    let disableNative = false;
+    if (project) {
+      disableNative =
+        project.accountingToken.toLowerCase() !== ETH_ADDRESS.toLowerCase();
+    }
+
+    // If the project is FLOWS-backed, don't disable native currency
+    // as we have the FlowsTerminal contract that handles the native currency swap
+    if (isFlowsBacked) {
+      disableNative = false;
+    }
 
     // 1. Native currency
     if (!disableNative) {
@@ -69,8 +83,6 @@ export function useAvailableCurrencies(
         });
       }
     }
-
-    console.log("currencies", currencies);
 
     return currencies;
   }, [selectedChain.id, project]);

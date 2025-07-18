@@ -30,6 +30,9 @@ export const JBDIRECTORY_ADDRESS =
 export const ETH_ADDRESS =
   "0x000000000000000000000000000000000000eeee" as const;
 
+export const FLOWS_ADDRESS =
+  "0xa66c1faefd257dbe9da50e56c7816b5710c9e2a1" as const;
+
 export const JBSWAPTERMINAL_ADDRESS: Record<number, `0x${string}`> = {
   [mainnet.id]: "0xdd98b25631aa9372a8cf09912b803d2ad80db161",
   [optimism.id]: "0xf7002a2df9bebf629b6093c8a60e28beed4f7b48",
