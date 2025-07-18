@@ -13,7 +13,6 @@ import {
 } from "@/registry/juicebox/pay-project-form/lib/abis";
 import {
   ETH_ADDRESS,
-  JBMULTITERMINAL_ADDRESS,
   JBSWAPTERMINAL_ADDRESS,
   type Currency,
 } from "@/registry/juicebox/pay-project-form/lib/chains";
@@ -118,7 +117,6 @@ export function usePayProject(
         accountingDecimals,
       } = args;
 
-      const isAccountingCurrency = currency.address === accountingToken;
       const isPayingEth = currency.address === ETH_ADDRESS;
       const memo = "";
       const metadata = "0x0" as `0x${string}`;
