@@ -34,13 +34,12 @@ export function TransactionConfirmationModal(props: Props) {
   const {
     payProject,
     approveToken,
-    checkAllowance,
     errorMessage,
     status,
     reset,
-  } = usePayProject(chain.id, BigInt(project.projectId));
+    needsApproval,
+  } = usePayProject(project, amount);
   const { address } = useAccount();
-  const [requiresApproval, setRequiresApproval] = useState(false);
 
   // Quote tokens to receive
   const { quote: tokenQuote } = useTokenQuote({
@@ -51,37 +50,8 @@ export function TransactionConfirmationModal(props: Props) {
     tokenPrice: project.token.price,
   });
 
-  // Check allowance when modal opens or currency changes
-  useEffect(() => {
-    if (isOpen && !currency.isNative && address) {
-      checkAllowance(currency.address, amount, currency.isNative).then(
-        (hasAllowance) => {
-          setRequiresApproval(!hasAllowance);
-        }
-      );
-    }
-  }, [isOpen, currency, amount, address, checkAllowance]);
-
-  // Recheck allowance after successful approval
-  useEffect(() => {
-    if (
-      status === "idle" &&
-      requiresApproval &&
-      !currency.isNative &&
-      address
-    ) {
-      // This will run after approval success when status returns to idle
-      checkAllowance(currency.address, amount, currency.isNative).then(
-        (hasAllowance) => {
-          setRequiresApproval(!hasAllowance);
-        }
-      );
-    }
-  }, [status, requiresApproval, currency, amount, address, checkAllowance]);
-
   const closeModal = () => {
     reset();
-    setRequiresApproval(false);
     onOpenChange(false);
   };
 
@@ -153,7 +123,7 @@ export function TransactionConfirmationModal(props: Props) {
               )}
               {address && (
                 <>
-                  {requiresApproval && !currency.isNative ? (
+                  {needsApproval && !currency.isNative ? (
                     <Button
                       onClick={() => {
                         approveToken(currency.address, amount);
@@ -170,10 +140,11 @@ export function TransactionConfirmationModal(props: Props) {
                       onClick={() => {
                         payProject({
                           projectId: BigInt(project.projectId),
-                          token: currency.address,
                           amount,
                           beneficiary: address,
                           currency,
+                          accountingToken: project.accountingToken,
+                          accountingDecimals: project.accountingDecimals,
                         });
                       }}
                       className="flex-1"

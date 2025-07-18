@@ -1,6 +1,6 @@
 "use client";
 
-import { parseEther } from "viem";
+import { parseEther, parseUnits, zeroAddress } from "viem";
 import { useState, useEffect } from "react";
 import {
   useWaitForTransactionReceipt,
@@ -17,44 +17,53 @@ import {
   JBSWAPTERMINAL_ADDRESS,
   type Currency,
 } from "@/registry/juicebox/pay-project-form/lib/chains";
-import { usePrimaryNativeTerminal } from "./use-primary-terminal";
+import { usePrimaryTerminal } from "./use-primary-terminal";
 import { useTokenAllowance } from "./use-token-allowance";
 import { useNormalizeAmount } from "./use-normalize-amount";
 import { usePrepareWallet } from "./use-prepare-wallet";
 import { Status } from "./use-transaction-status";
+import { Project } from "./use-projects";
 
 interface Args {
   projectId: bigint;
-  token: `0x${string}`;
   amount: string;
   beneficiary: `0x${string}`;
   minReturnedTokens?: bigint;
   currency: Currency;
+  accountingToken: `0x${string}`;
+  accountingDecimals: number;
 }
 
-export function usePayProject(chainId: number, projectId: bigint) {
+export function usePayProject(project: Project, amount: string) {
+  const { chainId, projectId, accountingToken } = project;
   // Local status & error handling
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const { prepareWallet } = usePrepareWallet();
-  const { data: primaryTerminal } = usePrimaryNativeTerminal(
+  const { data: primaryTerminal } = usePrimaryTerminal(
     chainId,
-    projectId
+    BigInt(projectId),
+    accountingToken
   );
+
   const { data: hash, isPending, error, writeContract } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 
   // Helper hooks
-  const {
-    checkAllowance,
-    approveToken,
-    needsApproval,
-    setNeedsApproval,
-    approvalHash,
-  } = useTokenAllowance(chainId, { setStatus, setErrorMessage });
+  const { approveToken, needsApproval, setNeedsApproval, approvalHash } =
+    useTokenAllowance(
+      project,
+      amount,
+      {
+        setStatus,
+        setErrorMessage,
+      },
+      primaryTerminal
+    );
+
   const { normalizeAmount } = useNormalizeAmount(chainId);
 
   // Sync payment transaction state to status
@@ -97,40 +106,38 @@ export function usePayProject(chainId: number, projectId: bigint) {
 
       const {
         projectId,
-        token,
         amount,
         beneficiary,
         minReturnedTokens = 0n,
         currency,
+        accountingToken,
+        accountingDecimals,
       } = args;
 
-      const isETH = currency.isNative;
+      const isAccountingCurrency = currency.address === accountingToken;
+      const isPayingEth = currency.address === ETH_ADDRESS;
       const memo = "";
       const metadata = "0x0" as `0x${string}`;
 
-      // Check allowance for ERC20 tokens
-      if (!isETH) {
-        const hasAllowance = await checkAllowance(token, amount, isETH);
-        if (!hasAllowance) {
-          setNeedsApproval(true);
-          setStatus("error");
-          setErrorMessage("Token approval required");
-          return;
-        }
-      }
+      const hasPrimaryTerminal =
+        !!primaryTerminal && primaryTerminal !== zeroAddress;
 
-      if (isETH) {
+      const terminalAddress = hasPrimaryTerminal
+        ? primaryTerminal
+        : JBMULTITERMINAL_ADDRESS;
+
+      if (isAccountingCurrency) {
         // Native token payment through multi-terminal
-        const value = parseEther(amount);
+        const value = isPayingEth ? parseEther(amount) : 0n;
 
         writeContract({
-          address: primaryTerminal ?? JBMULTITERMINAL_ADDRESS,
+          address: terminalAddress,
           abi: jbMultiTerminalAbi,
           functionName: "pay",
           args: [
             projectId,
-            ETH_ADDRESS,
-            value,
+            accountingToken,
+            parseUnits(amount, accountingDecimals),
             beneficiary,
             minReturnedTokens,
             memo,
@@ -158,7 +165,7 @@ export function usePayProject(chainId: number, projectId: bigint) {
           functionName: "pay",
           args: [
             projectId,
-            token,
+            currency.address,
             payAmount,
             beneficiary,
             minReturnedTokens,
@@ -210,7 +217,6 @@ export function usePayProject(chainId: number, projectId: bigint) {
     approvalHash,
     payProject,
     approveToken: handleApproveToken,
-    checkAllowance,
     needsApproval,
     reset: () => {
       setStatus("idle");

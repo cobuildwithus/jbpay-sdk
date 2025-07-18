@@ -19,6 +19,9 @@ export interface Project {
   };
   suckerGroupId: string;
   isRevnet: boolean;
+  accountingToken: `0x${string}`;
+  accountingDecimals: number;
+  accountingCurrency: number;
 }
 
 export const useProjects = (args: {
