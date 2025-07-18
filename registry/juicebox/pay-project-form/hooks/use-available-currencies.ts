@@ -23,9 +23,10 @@ export function useAvailableCurrencies(
   return useMemo(() => {
     const currencies: Currency[] = [];
 
-    // Whether project accepts native currency
-    const disableNative =
-      project?.accountingToken?.toLowerCase() !== ETH_ADDRESS.toLowerCase();
+    // Native currency is disabled only when we have project data and it differs
+    const disableNative = project
+      ? project.accountingToken.toLowerCase() !== ETH_ADDRESS.toLowerCase()
+      : false;
 
     // 1. Native currency
     if (!disableNative) {
