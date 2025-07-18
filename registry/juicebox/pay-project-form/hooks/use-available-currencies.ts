@@ -13,7 +13,7 @@ import { Project } from "./use-projects";
  * Returns list of currencies user can pay with for given chain + project.
  * Will:
  * 1. Include native currency (ETH, etc.) unless the project cannot accept it.
- * 2. Include chain-specific supported stablecoins.
+ * 2. Include chain-specific supported stablecoins (only if accounting token is ETH).
  * 3. Include the project’s accounting token (if it differs from native).
  */
 export function useAvailableCurrencies(
@@ -37,17 +37,23 @@ export function useAvailableCurrencies(
       });
     }
 
-    // 2. Chain stablecoins
-    const supported = SUPPORTED_TOKENS[selectedChain.id]
-      ? Object.entries(SUPPORTED_TOKENS[selectedChain.id]).map(
-          ([symbol, address]) => ({
-            symbol,
-            address,
-            isNative: false,
-          })
-        )
-      : [];
-    currencies.push(...supported);
+    // 2. Chain stablecoins (only if accounting token is ETH)
+    const isAccountingTokenEth =
+      !project ||
+      project.accountingToken.toLowerCase() === ETH_ADDRESS.toLowerCase();
+
+    if (isAccountingTokenEth) {
+      const supported = SUPPORTED_TOKENS[selectedChain.id]
+        ? Object.entries(SUPPORTED_TOKENS[selectedChain.id]).map(
+            ([symbol, address]) => ({
+              symbol,
+              address,
+              isNative: false,
+            })
+          )
+        : [];
+      currencies.push(...supported);
+    }
 
     // 3. Project accounting token
     if (project) {
