@@ -40,7 +40,7 @@ export function useTokenQuote({
 
     const fetchQuote = async () => {
       try {
-        if (currency.isNative) {
+        if (tokenPrice !== "0") {
           // Native currency path - reuse existing util
           const q = calculateTokensFromEth(amount, tokenPrice);
           if (!cancelled) setQuote(q);
