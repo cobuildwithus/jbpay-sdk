@@ -11,34 +11,34 @@ import {
   Chain,
 } from "viem/chains";
 
-// Helper to fetch Alchemy key
-function getAlchemyKey() {
-  return process.env.NEXT_PUBLIC_ALCHEMY_ID;
+// Helper to fetch Infura key
+function getInfuraKey() {
+  return process.env.NEXT_PUBLIC_INFURA_ID;
 }
 
 export function getRpcUrl(chain: Chain, type: "http" | "ws") {
-  const alchemyId = getAlchemyKey();
-  if (!alchemyId) throw new Error("Missing Alchemy env var");
+  const infuraId = getInfuraKey();
+  if (!infuraId) throw new Error("Missing Infura env var");
 
   const protocol = type === "http" ? "https" : "wss";
 
   switch (chain.id) {
-    case base.id:
-      return `${protocol}://base-mainnet.g.alchemy.com/v2/${alchemyId}`;
-    case baseSepolia.id:
-      return `${protocol}://base-sepolia.g.alchemy.com/v2/${alchemyId}`;
     case mainnet.id:
-      return `${protocol}://eth-mainnet.g.alchemy.com/v2/${alchemyId}`;
+      return `${protocol}://mainnet.infura.io/v3/${infuraId}`;
     case optimism.id:
-      return `${protocol}://opt-mainnet.g.alchemy.com/v2/${alchemyId}`;
+      return `${protocol}://optimism-mainnet.infura.io/v3/${infuraId}`;
+    case base.id:
+      return `${protocol}://base-mainnet.infura.io/v3/${infuraId}`;
     case arbitrum.id:
-      return `${protocol}://arb-mainnet.g.alchemy.com/v2/${alchemyId}`;
+      return `${protocol}://arbitrum-mainnet.infura.io/v3/${infuraId}`;
     case sepolia.id:
-      return `${protocol}://eth-sepolia.g.alchemy.com/v2/${alchemyId}`;
+      return `${protocol}://sepolia.infura.io/v3/${infuraId}`;
+    case baseSepolia.id:
+      return `${protocol}://base-sepolia.infura.io/v3/${infuraId}`;
     case optimismSepolia.id:
-      return `${protocol}://opt-sepolia.g.alchemy.com/v2/${alchemyId}`;
+      return `${protocol}://optimism-sepolia.infura.io/v3/${infuraId}`;
     case arbitrumSepolia.id:
-      return `${protocol}://arb-sepolia.g.alchemy.com/v2/${alchemyId}`;
+      return `${protocol}://arbitrum-sepolia.infura.io/v3/${infuraId}`;
     default:
       throw new Error(`Unsupported chain: ${chain.id}`);
   }

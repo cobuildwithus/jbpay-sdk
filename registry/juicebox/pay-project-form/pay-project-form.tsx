@@ -21,6 +21,8 @@ import { mainnet, base } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
 import Image from "next/image";
 import revnetIcon from "./revnet.svg";
+import { useAvailableCurrencies } from "@/registry/juicebox/pay-project-form/hooks/use-available-currencies";
+import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";
 
 // Optional environment variables
 const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
@@ -102,13 +104,8 @@ export function PayProjectForm() {
     return projects.find((p) => p.chainId === selectedChain.id) || null;
   }, [projects, selectedChain.id]);
 
-  // Get available chains based on the projects returned from API
-  const availableChains = useMemo(() => {
-    if (!projects || projects.length === 0) return jbChains;
-
-    const projectChainIds = projects.map((p) => p.chainId);
-    return jbChains.filter((chain) => projectChainIds.includes(chain.id));
-  }, [projects]);
+  // Derive chains user can select based on fetched project data
+  const availableChains = useAvailableChains(projects);
 
   useEffect(() => {
     setShowConnectButton(!isConnected);
@@ -132,6 +129,17 @@ export function PayProjectForm() {
     currency: selectedCurrency,
     tokenPrice: project?.token.price || "0",
   });
+
+  const availableCurrencies = useAvailableCurrencies(selectedChain, project);
+
+  // Ensure selectedCurrency is always in availableCurrencies
+  useEffect(() => {
+    if (
+      !availableCurrencies.find((c) => c.address === selectedCurrency.address)
+    ) {
+      setSelectedCurrency(availableCurrencies[0]);
+    }
+  }, [availableCurrencies, selectedCurrency.address]);
 
   return (
     <>
@@ -181,6 +189,7 @@ export function PayProjectForm() {
                   setSelectedCurrency(currency);
                 }}
                 availableChains={availableChains}
+                availableCurrencies={availableCurrencies}
               />
 
               <div className="relative">

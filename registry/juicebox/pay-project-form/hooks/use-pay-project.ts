@@ -38,7 +38,7 @@ export function usePayProject(
   amount: string,
   paymentToken: `0x${string}`
 ) {
-  const { chainId, projectId, accountingToken } = project;
+  const { chainId, projectId } = project;
   // Local status & error handling
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");

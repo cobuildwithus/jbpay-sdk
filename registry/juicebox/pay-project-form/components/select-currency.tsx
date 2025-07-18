@@ -9,8 +9,6 @@ import {
 import { cn } from "@/lib/utils";
 import {
   jbChains,
-  SUPPORTED_TOKENS,
-  ETH_ADDRESS,
   type Currency,
 } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { Chain } from "viem";
@@ -24,6 +22,7 @@ interface Props {
   onSelectChain: (chain: Chain) => void;
   onSelectCurrency: (currency: Currency) => void;
   availableChains?: Chain[];
+  availableCurrencies: Currency[];
 }
 
 function CurrencyBalance({
@@ -66,30 +65,11 @@ export function SelectCurrency(props: Props) {
     onSelectChain,
     onSelectCurrency,
     availableChains = jbChains,
+    availableCurrencies,
   } = props;
 
   const [isChainOpen, setIsChainOpen] = useState(false);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
-
-  // Get available currencies for the selected chain
-  const availableCurrencies: Currency[] = [
-    // Native currency (ETH, etc.)
-    {
-      symbol: selectedChain.nativeCurrency.symbol,
-      address: ETH_ADDRESS,
-      isNative: true,
-    },
-    // Supported tokens for this chain
-    ...(SUPPORTED_TOKENS[selectedChain.id]
-      ? Object.entries(SUPPORTED_TOKENS[selectedChain.id]).map(
-          ([symbol, address]) => ({
-            symbol,
-            address,
-            isNative: false,
-          })
-        )
-      : []),
-  ];
 
   return (
     <div className="flex w-full gap-2">
@@ -127,12 +107,6 @@ export function SelectCurrency(props: Props) {
                 key={chain.id}
                 onClick={() => {
                   onSelectChain(chain);
-                  // Reset to native currency when changing chains
-                  onSelectCurrency({
-                    symbol: chain.nativeCurrency.symbol,
-                    address: ETH_ADDRESS,
-                    isNative: true,
-                  });
                   setIsChainOpen(false);
                 }}
                 className={cn(

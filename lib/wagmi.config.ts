@@ -9,55 +9,18 @@ import {
   optimismSepolia,
   sepolia,
 } from "viem/chains";
-import { createConfig, fallback, http, injected, Transport } from "wagmi";
-
-const INFURA_ID = process.env.NEXT_PUBLIC_INFURA_ID;
+import { createConfig, http, injected, Transport } from "wagmi";
+import { getRpcUrl } from "@/lib/client";
 
 export const transports: Record<number, Transport> = {
-  [mainnet.id]: fallback([
-    ...(INFURA_ID ? [http(`https://mainnet.infura.io/v3/${INFURA_ID}`)] : []),
-    http(),
-  ]),
-  [optimism.id]: fallback([
-    ...(INFURA_ID
-      ? [http(`https://optimism-mainnet.infura.io/v3/${INFURA_ID}`)]
-      : []),
-    http(),
-  ]),
-  [base.id]: fallback([
-    ...(INFURA_ID
-      ? [http(`https://base-mainnet.infura.io/v3/${INFURA_ID}`)]
-      : []),
-    http(),
-  ]),
-  [arbitrum.id]: fallback([
-    ...(INFURA_ID
-      ? [http(`https://arbitrum-mainnet.infura.io/v3/${INFURA_ID}`)]
-      : []),
-    http(),
-  ]),
-  [baseSepolia.id]: fallback([
-    ...(INFURA_ID
-      ? [http(`https://base-sepolia.infura.io/v3/${INFURA_ID}`)]
-      : []),
-    http(),
-  ]),
-  [optimismSepolia.id]: fallback([
-    ...(INFURA_ID
-      ? [http(`https://optimism-sepolia.infura.io/v3/${INFURA_ID}`)]
-      : []),
-    http(),
-  ]),
-  [arbitrumSepolia.id]: fallback([
-    ...(INFURA_ID
-      ? [http(`https://arbitrum-sepolia.infura.io/v3/${INFURA_ID}`)]
-      : []),
-    http(),
-  ]),
-  [sepolia.id]: fallback([
-    ...(INFURA_ID ? [http(`https://sepolia.infura.io/v3/${INFURA_ID}`)] : []),
-    http(),
-  ]),
+  [mainnet.id]: http(getRpcUrl(mainnet, "http")),
+  [optimism.id]: http(getRpcUrl(optimism, "http")),
+  [base.id]: http(getRpcUrl(base, "http")),
+  [arbitrum.id]: http(getRpcUrl(arbitrum, "http")),
+  [baseSepolia.id]: http(getRpcUrl(baseSepolia, "http")),
+  [optimismSepolia.id]: http(getRpcUrl(optimismSepolia, "http")),
+  [arbitrumSepolia.id]: http(getRpcUrl(arbitrumSepolia, "http")),
+  [sepolia.id]: http(getRpcUrl(sepolia, "http")),
 };
 
 export const wagmiConfig = createConfig({

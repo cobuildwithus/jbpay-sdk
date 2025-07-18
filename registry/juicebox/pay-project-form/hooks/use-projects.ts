@@ -22,6 +22,8 @@ export interface Project {
   accountingToken: `0x${string}`;
   accountingDecimals: number;
   accountingCurrency: number;
+  accountingTokenSymbol: string;
+  accountingTokenName: string;
 }
 
 export const useProjects = (args: {
