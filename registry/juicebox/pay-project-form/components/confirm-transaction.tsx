@@ -10,14 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Chain } from "viem";
-import { useAccount } from "wagmi";
+import { ConnectButton } from "@/registry/juicebox/common/components/connect-button";
+import { type Currency } from "@/registry/juicebox/common/lib/chains";
 import { usePayProject } from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
 import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
-import { type Currency } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { useTokenQuote } from "@/registry/juicebox/pay-project-form/hooks/use-token-quote";
-import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
-import { useState, useEffect } from "react";
+import { Chain } from "viem";
+import { useAccount } from "wagmi";
 import { Status } from "../hooks/use-transaction-status";
 
 interface Props {
@@ -31,14 +30,11 @@ interface Props {
 
 export function TransactionConfirmationModal(props: Props) {
   const { isOpen, onOpenChange, amount, project, chain, currency } = props;
-  const {
-    payProject,
-    approveToken,
-    errorMessage,
-    status,
-    reset,
-    needsApproval,
-  } = usePayProject(project, amount, currency.address);
+  const { payProject, approveToken, errorMessage, status, reset, needsApproval } = usePayProject(
+    project,
+    amount,
+    currency.address
+  );
   const { address } = useAccount();
 
   // Quote tokens to receive
@@ -89,9 +85,7 @@ export function TransactionConfirmationModal(props: Props) {
             </div>
             {tokenQuote && (
               <div className="flex justify-between items-center mt-2">
-                <span className="text-sm text-muted-foreground">
-                  You Receive:
-                </span>
+                <span className="text-sm text-muted-foreground">You Receive:</span>
                 <span className="text-lg font-medium">
                   ~{tokenQuote} {project.token.symbol}
                 </span>
@@ -159,16 +153,11 @@ export function TransactionConfirmationModal(props: Props) {
               )}
             </div>
             <div
-              className={cn(
-                "text-xs text-muted-foreground text-center min-h-4 -mt-1",
-                {
-                  "text-destructive": status === "error",
-                  "animate-pulse":
-                    status === "pending" ||
-                    status === "connecting" ||
-                    status === "confirming",
-                }
-              )}
+              className={cn("text-xs text-muted-foreground text-center min-h-4 -mt-1", {
+                "text-destructive": status === "error",
+                "animate-pulse":
+                  status === "pending" || status === "connecting" || status === "confirming",
+              })}
             >
               {getStatusMessage(status, errorMessage)}
             </div>

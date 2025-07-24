@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
-import { Chain } from "viem";
 import {
   ETH_ADDRESS,
   FLOWS_ADDRESS,
   SUPPORTED_TOKENS,
   type Currency,
-} from "@/registry/juicebox/pay-project-form/lib/chains";
+} from "@/registry/juicebox/common/lib/chains";
+import { useMemo } from "react";
+import { type Chain } from "viem";
 import { Project } from "./use-projects";
 
 /**
@@ -32,8 +32,7 @@ export function useAvailableCurrencies(
     // Disable native currency if the project's accounting token is not ETH
     let disableNative = false;
     if (project) {
-      disableNative =
-        project.accountingToken.toLowerCase() !== ETH_ADDRESS.toLowerCase();
+      disableNative = project.accountingToken.toLowerCase() !== ETH_ADDRESS.toLowerCase();
     }
 
     // If the project is FLOWS-backed, don't disable native currency
@@ -53,18 +52,15 @@ export function useAvailableCurrencies(
 
     // 2. Chain stablecoins (only if accounting token is ETH)
     const isAccountingTokenEth =
-      !project ||
-      project.accountingToken.toLowerCase() === ETH_ADDRESS.toLowerCase();
+      !project || project.accountingToken.toLowerCase() === ETH_ADDRESS.toLowerCase();
 
     if (isAccountingTokenEth) {
       const supported = SUPPORTED_TOKENS[selectedChain.id]
-        ? Object.entries(SUPPORTED_TOKENS[selectedChain.id]).map(
-            ([symbol, address]) => ({
-              symbol,
-              address,
-              isNative: false,
-            })
-          )
+        ? Object.entries(SUPPORTED_TOKENS[selectedChain.id]).map(([symbol, address]) => ({
+            symbol,
+            address,
+            isNative: false,
+          }))
         : [];
       currencies.push(...supported);
     }

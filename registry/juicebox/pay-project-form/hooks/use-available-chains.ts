@@ -1,17 +1,15 @@
 "use client";
 
+import { jbChains } from "@/registry/juicebox/common/lib/chains";
 import { useMemo } from "react";
-import { Chain } from "viem";
-import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
+import { type Chain } from "viem";
 import { Project } from "./use-projects";
 
 /**
  * Returns the list of chains that have a published configuration for the given set of projects.
  * If the projects list is empty or undefined, all Juicebox chains are returned.
  */
-export function useAvailableChains(
-  projects: Project[] | null | undefined
-): Chain[] {
+export function useAvailableChains(projects: Project[] | null | undefined): Chain[] {
   return useMemo(() => {
     if (!projects || projects.length === 0) return jbChains;
 

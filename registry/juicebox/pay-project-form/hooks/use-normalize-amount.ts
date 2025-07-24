@@ -1,16 +1,13 @@
 "use client";
 
-import { parseEther, parseUnits, erc20Abi } from "viem";
-import { type Currency } from "@/registry/juicebox/pay-project-form/lib/chains";
 import { getClient } from "@/lib/client";
+import { type Currency } from "@/registry/juicebox/common/lib/chains";
+import { erc20Abi, parseEther, parseUnits } from "viem";
 
 export function useNormalizeAmount(chainId: number) {
   const publicClient = getClient(chainId);
 
-  const normalizeAmount = async (
-    amount: string,
-    currency: Currency
-  ): Promise<bigint> => {
+  const normalizeAmount = async (amount: string, currency: Currency): Promise<bigint> => {
     if (currency.isNative) {
       // Native tokens always use 18 decimals
       return parseEther(amount);

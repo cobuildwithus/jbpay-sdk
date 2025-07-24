@@ -1,27 +1,20 @@
 "use client";
 
-import { parseEther, parseUnits, zeroAddress } from "viem";
-import { useState, useEffect } from "react";
-import {
-  useWaitForTransactionReceipt,
-  useWriteContract,
-  type BaseError,
-} from "wagmi";
-import {
-  jbMultiTerminalAbi,
-  jbSwapTerminalAbi,
-} from "@/registry/juicebox/pay-project-form/lib/abis";
+import { jbMultiTerminalAbi, jbSwapTerminalAbi } from "@/registry/juicebox/common/lib/abis";
 import {
   ETH_ADDRESS,
   JBSWAPTERMINAL_ADDRESS,
   type Currency,
-} from "@/registry/juicebox/pay-project-form/lib/chains";
-import { usePrimaryTerminal } from "./use-primary-terminal";
-import { useTokenAllowance } from "./use-token-allowance";
+} from "@/registry/juicebox/common/lib/chains";
+import { useEffect, useState } from "react";
+import { parseEther, parseUnits, zeroAddress } from "viem";
+import { useWaitForTransactionReceipt, useWriteContract, type BaseError } from "wagmi";
 import { useNormalizeAmount } from "./use-normalize-amount";
 import { usePrepareWallet } from "./use-prepare-wallet";
-import { Status } from "./use-transaction-status";
+import { usePrimaryTerminal } from "./use-primary-terminal";
 import { Project } from "./use-projects";
+import { useTokenAllowance } from "./use-token-allowance";
+import { Status } from "./use-transaction-status";
 
 interface Args {
   projectId: bigint;
@@ -33,39 +26,25 @@ interface Args {
   accountingDecimals: number;
 }
 
-export function usePayProject(
-  project: Project,
-  amount: string,
-  paymentToken: `0x${string}`
-) {
+export function usePayProject(project: Project, amount: string, paymentToken: `0x${string}`) {
   const { chainId, projectId } = project;
-  // Local status & error handling
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const { prepareWallet } = usePrepareWallet();
-  const { data: primaryTerminal } = usePrimaryTerminal(
-    chainId,
-    BigInt(projectId),
-    paymentToken
-  );
+  const { data: primaryTerminal } = usePrimaryTerminal(chainId, BigInt(projectId), paymentToken);
 
   const { data: hash, isPending, error, writeContract } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 
-  // Helper hooks
-  const { approveToken, needsApproval, setNeedsApproval, approvalHash } =
-    useTokenAllowance(
-      project,
-      amount,
-      {
-        setStatus,
-        setErrorMessage,
-      },
-      primaryTerminal
-    );
+  const { approveToken, needsApproval, approvalHash } = useTokenAllowance(
+    project,
+    amount,
+    { setStatus, setErrorMessage },
+    primaryTerminal
+  );
 
   const { normalizeAmount } = useNormalizeAmount(chainId);
 
@@ -121,8 +100,7 @@ export function usePayProject(
       const memo = "";
       const metadata = "0x0" as `0x${string}`;
 
-      const hasPrimaryTerminal =
-        !!primaryTerminal && primaryTerminal !== zeroAddress;
+      const hasPrimaryTerminal = !!primaryTerminal && primaryTerminal !== zeroAddress;
 
       if (hasPrimaryTerminal) {
         // Native token payment through multi-terminal
@@ -179,11 +157,7 @@ export function usePayProject(
     } catch (e) {
       console.error(e);
       setStatus("error");
-      setErrorMessage(
-        e instanceof Error
-          ? e.message
-          : (e as any).shortMessage || "Unknown error"
-      );
+      setErrorMessage(e instanceof Error ? e.message : (e as any).shortMessage || "Unknown error");
     }
   };
 
@@ -204,9 +178,7 @@ export function usePayProject(
       await approveToken(token, amount);
     } catch (e) {
       setStatus("error");
-      setErrorMessage(
-        e instanceof Error ? e.message : "Failed to approve token"
-      );
+      setErrorMessage(e instanceof Error ? e.message : "Failed to approve token");
     }
   };
 

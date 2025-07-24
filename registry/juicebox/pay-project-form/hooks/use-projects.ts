@@ -1,9 +1,7 @@
 "use client";
 
+import { API_URL } from "@/registry/juicebox/common/lib/api";
 import { useQuery } from "@tanstack/react-query";
-
-const API_URL =
-  process.env.NEXT_PUBLIC_JBSDK_API_URL || "https://jbdb.up.railway.app";
 
 export interface Project {
   chainId: number;
@@ -35,14 +33,10 @@ export const useProjects = (args: {
   return useQuery({
     queryKey: ["projects", chainId, projectId],
     queryFn: async () => {
-      const response = await fetch(
-        `${API_URL}/project/${chainId}/${projectId}`
-      );
+      const response = await fetch(`${API_URL}/project/${chainId}/${projectId}`);
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch projects: ${response.status} ${response.statusText}`
-        );
+        throw new Error(`Failed to fetch projects: ${response.status} ${response.statusText}`);
       }
 
       return response.json() as Promise<Project[]>;

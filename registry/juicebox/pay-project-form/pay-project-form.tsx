@@ -4,25 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatProjectInput, parseProjectInput } from "@/lib/chains";
+import { ConnectButton } from "@/registry/juicebox/common/components/connect-button";
+import revnetIcon from "@/registry/juicebox/common/images/revnet.svg";
+import { ETH_ADDRESS, jbChains, type Currency } from "@/registry/juicebox/common/lib/chains";
 import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";
-import { ConnectButton } from "@/registry/juicebox/pay-project-form/components/connect-button";
 import { SelectCurrency } from "@/registry/juicebox/pay-project-form/components/select-currency";
+import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";
+import { useAvailableCurrencies } from "@/registry/juicebox/pay-project-form/hooks/use-available-currencies";
 import { useProjects } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { useTokenQuote } from "@/registry/juicebox/pay-project-form/hooks/use-token-quote";
-import {
-  jbChains,
-  ETH_ADDRESS,
-  type Currency,
-} from "@/registry/juicebox/pay-project-form/lib/chains";
-import { formatProjectInput, parseProjectInput } from "@/lib/chains";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { Chain, formatEther } from "viem";
-import { mainnet, base } from "viem/chains";
+import { base, mainnet } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
-import Image from "next/image";
-import revnetIcon from "./revnet.svg";
-import { useAvailableCurrencies } from "@/registry/juicebox/pay-project-form/hooks/use-available-currencies";
-import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";
 
 // Optional environment variables
 const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
@@ -52,9 +48,7 @@ export function PayProjectForm() {
   const [showConnectButton, setShowConnectButton] = useState(true);
 
   // Track the input value separately to allow free editing
-  const [inputValue, setInputValue] = useState(() =>
-    formatProjectInput(selectedChain, projectId)
-  );
+  const [inputValue, setInputValue] = useState(() => formatProjectInput(selectedChain, projectId));
 
   // Handle project input changes
   const handleProjectInputChange = (value: string) => {
@@ -134,9 +128,7 @@ export function PayProjectForm() {
 
   // Ensure selectedCurrency is always in availableCurrencies
   useEffect(() => {
-    if (
-      !availableCurrencies.find((c) => c.address === selectedCurrency.address)
-    ) {
+    if (!availableCurrencies.find((c) => c.address === selectedCurrency.address)) {
       setSelectedCurrency(availableCurrencies[0]);
     }
   }, [availableCurrencies, selectedCurrency.address]);
@@ -211,8 +203,7 @@ export function PayProjectForm() {
                   onClick={() => {
                     if (selectedCurrency.isNative) {
                       const amount = Number(formatEther(balance?.value ?? 0n));
-                      const gasBuffer =
-                        selectedChain.id === mainnet.id ? 0.001 : 0.000025;
+                      const gasBuffer = selectedChain.id === mainnet.id ? 0.001 : 0.000025;
                       setAmount(Math.max(amount - gasBuffer, 0).toFixed(5));
                     } else {
                       // For ERC20 tokens, use the full balance
@@ -228,10 +219,7 @@ export function PayProjectForm() {
           </div>
 
           {showConnectButton ? (
-            <ConnectButton
-              className="w-full h-12 text-lg font-medium"
-              size="lg"
-            />
+            <ConnectButton className="w-full h-12 text-lg font-medium" size="lg" />
           ) : (
             <Button
               type="button"
@@ -247,9 +235,7 @@ export function PayProjectForm() {
           {tokenQuote && (
             <div
               className={`text-center text-sm text-muted-foreground transition-opacity duration-300 -mt-2.5 ${
-                project && amount && Number.parseFloat(amount) > 0
-                  ? "opacity-100"
-                  : "opacity-0"
+                project && amount && Number.parseFloat(amount) > 0 ? "opacity-100" : "opacity-0"
               }`}
             >
               You'll receive ~{tokenQuote} {project?.token.symbol}

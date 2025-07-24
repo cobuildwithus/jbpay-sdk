@@ -1,6 +1,6 @@
+import { jbDirectoryAbi } from "@/registry/juicebox/common/lib/abis";
+import { JBDIRECTORY_ADDRESS } from "@/registry/juicebox/common/lib/chains";
 import { useReadContract } from "wagmi";
-import { JBDIRECTORY_ADDRESS } from "../lib/chains";
-import { jbDirectoryAbi } from "../lib/abis";
 
 export function usePrimaryTerminal(
   chainId: number,

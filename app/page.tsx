@@ -1,6 +1,10 @@
+"use client";
+
+import { ComponentParams } from "@/components/component-params";
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { getRegistryUrl } from "@/lib/utils";
+import { ActivityLog } from "@/registry/juicebox/activity-log/activity-log";
 import { PayProjectForm } from "@/registry/juicebox/pay-project-form/pay-project-form";
 import Link from "next/link";
 import { PropsWithChildren } from "react";
@@ -11,9 +15,7 @@ export default function Home() {
       <header className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold tracking-tight">JuicePay SDK</h1>
-          <p className="text-muted-foreground">
-            Custom UI components for Juicebox projects.
-          </p>
+          <p className="text-muted-foreground">Custom UI components for Juicebox projects.</p>
         </div>
         <div className="flex gap-3">
           <Link href="/quickstart">
@@ -32,27 +34,26 @@ export default function Home() {
         <ComponentPreview name="pay-project-form" usage="PayProjectForm">
           <PayProjectForm />
         </ComponentPreview>
+        <ComponentPreview name="activity-log" usage="ActivityLog">
+          <ComponentParams params={{ chainId: 8453, projectId: 3, perPage: 10 }}>
+            {(props) => <ActivityLog {...props} />}
+          </ComponentParams>
+        </ComponentPreview>
       </main>
     </div>
   );
 }
 
-function ComponentPreview(
-  props: PropsWithChildren<{ name: string; usage: string }>
-) {
+function ComponentPreview(props: PropsWithChildren<{ name: string; usage: string }>) {
   const { name, usage, children } = props;
 
   return (
-    <div className="flex flex-col gap-4 border-2 border-dashed border-border rounded-lg p-4 min-h-[450px] relative">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm text-muted-foreground sm:pl-3">
-          &lt;{usage} /&gt;
-        </h2>
-        <CopyButton
-          content={`pnpm dlx shadcn@latest add ${getRegistryUrl()}/${name}.json`}
-        />
+    <div className="flex flex-col gap-4 border-2 border-dashed border-border rounded-lg p-4 relative">
+      <div className="flex items-center justify-between sm:p-3">
+        <h2 className="text-sm text-muted-foreground">&lt;{usage} /&gt;</h2>
+        <CopyButton content={`pnpm dlx shadcn@latest add ${getRegistryUrl()}/${name}.json`} />
       </div>
-      <div className="flex items-center justify-center min-h-[500px] relative">
+      <div className="flex flex-col w-full grow items-center justify-center min-h-[360px] relative sm:p-3">
         {children}
       </div>
     </div>

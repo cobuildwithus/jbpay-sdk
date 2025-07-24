@@ -7,9 +7,8 @@ export default function QuickstartPage() {
       <h1 className="text-4xl font-bold mb-8">Quickstart Guide</h1>
 
       <p className="text-lg text-muted-foreground mb-8">
-        Get up and running with the JuicePay SDK in just a few minutes. This
-        guide will walk you through creating a new Next.js app and integrating
-        the payment form.
+        Get up and running with the JuicePay SDK in just a few minutes. This guide will walk you
+        through creating a new Next.js app and integrating the payment form.
       </p>
 
       <div className="space-y-8">
@@ -25,9 +24,7 @@ cd my-jb-app
 pnpm install
 pnpm dev`}</code>
             </pre>
-            <p className="mt-4 text-sm text-muted-foreground">
-              When prompted, we recommend:
-            </p>
+            <p className="mt-4 text-sm text-muted-foreground">When prompted, we recommend:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>TypeScript: Yes</li>
               <li>ESLint: Yes</li>
@@ -39,21 +36,18 @@ pnpm dev`}</code>
 
         <Card>
           <CardHeader>
-            <CardTitle>
-              Step 2: Install the Pay Project Form component
-            </CardTitle>
+            <CardTitle>Step 2: Install the Pay Project Form component</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              Use the shadcn CLI to add the payment form component from our
-              registry:
+              Use the shadcn CLI to add the payment form component from our registry:
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-              <code className="language-bash">{`pnpm dlx shadcn@latest add https://jbpay-sdk.vercel.app/r/pay-project-form.json`}</code>
+              <code className="language-bash">{`pnpm dlx shadcn@latest add https://juicepay.eth.sucks/r/pay-project-form.json`}</code>
             </pre>
             <p className="mt-4 text-sm text-muted-foreground">
-              This will install the component and all its dependencies,
-              including wagmi, viem, and @tanstack/react-query.
+              This will install the component and all its dependencies, including wagmi, viem, and
+              @tanstack/react-query.
             </p>
           </CardContent>
         </Card>
@@ -65,10 +59,7 @@ pnpm dev`}</code>
           <CardContent>
             <p className="mb-4">
               Create a Wagmi configuration file at{" "}
-              <code className="bg-muted px-2 py-1 rounded">
-                lib/wagmi.config.ts
-              </code>
-              :
+              <code className="bg-muted px-2 py-1 rounded">lib/wagmi.config.ts</code>:
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
               <code className="language-typescript">{`import { arbitrum, base, mainnet, optimism } from "viem/chains";
@@ -106,10 +97,7 @@ export const wagmiConfig = createConfig({
 
             <p className="mt-6 mb-4">
               Create a Wagmi Provider component at{" "}
-              <code className="bg-muted px-2 py-1 rounded">
-                components/wagmi-provider.tsx
-              </code>
-              :
+              <code className="bg-muted px-2 py-1 rounded">components/wagmi-provider.tsx</code>:
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
               <code className="language-typescript">{`"use client";
@@ -132,8 +120,7 @@ export const WagmiProvider = ({ children }: PropsWithChildren) => {
 
             <p className="mt-6 mb-4">
               Wrap your app with the Wagmi Provider in{" "}
-              <code className="bg-muted px-2 py-1 rounded">app/layout.tsx</code>
-              :
+              <code className="bg-muted px-2 py-1 rounded">app/layout.tsx</code>:
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
               <code className="language-typescript">{`import { WagmiProvider } from "@/components/wagmi-provider";
@@ -163,9 +150,8 @@ export default function RootLayout({
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              Create a{" "}
-              <code className="bg-muted px-2 py-1 rounded">.env.local</code>{" "}
-              file in your project root:
+              Create a <code className="bg-muted px-2 py-1 rounded">.env.local</code> file in your
+              project root:
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="language-bash">{`# Optional: Hardcode a project ID to hide the project ID input
@@ -178,9 +164,8 @@ NEXT_PUBLIC_DEFAULT_CHAIN_ID=1
 NEXT_PUBLIC_INFURA_ID=your_infura_project_id`}</code>
             </pre>
             <p className="mt-4 text-sm text-muted-foreground">
-              Note: The first two variables are specific to the Pay Project Form
-              component. The Infura ID is optional but recommended for
-              production apps.
+              Note: The first two variables are specific to the Pay Project Form component. The
+              Infura ID is optional but recommended for production apps.
             </p>
           </CardContent>
         </Card>
@@ -214,8 +199,8 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              The Pay Project Form automatically adapts to your shadcn theme and
-              supports dark mode out of the box.
+              The Pay Project Form automatically adapts to your shadcn theme and supports dark mode
+              out of the box.
             </p>
 
             <div className="space-y-4">
@@ -228,22 +213,17 @@ export default function Home() {
                   <code className="language-bash">{`pnpm add next-themes`}</code>
                 </pre>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Then wrap your app with the ThemeProvider. The component will
-                  automatically adapt to the current theme.
+                  Then wrap your app with the ThemeProvider. The component will automatically adapt
+                  to the current theme.
                 </p>
               </div>
 
               <div>
                 <h4 className="font-semibold mb-2">Custom Themes</h4>
                 <p className="text-sm text-muted-foreground">
-                  The component uses standard shadcn CSS variables, so it will
-                  automatically match any custom theme you&apos;ve configured.
-                  Visit the{" "}
-                  <Link
-                    href="https://ui.shadcn.com/themes"
-                    className="underline"
-                    target="_blank"
-                  >
+                  The component uses standard shadcn CSS variables, so it will automatically match
+                  any custom theme you&apos;ve configured. Visit the{" "}
+                  <Link href="https://ui.shadcn.com/themes" className="underline" target="_blank">
                     shadcn themes
                   </Link>{" "}
                   page to customize your colors.
@@ -255,14 +235,12 @@ export default function Home() {
 
         <Card className="border-green-500/20 bg-green-500/5">
           <CardHeader>
-            <CardTitle className="text-green-700 dark:text-green-400">
-              🎉 That&apos;s it!
-            </CardTitle>
+            <CardTitle className="text-green-700 dark:text-green-400">🎉 That&apos;s it!</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-green-700 dark:text-green-400">
-              You now have a fully functional Juicebox payment form in your
-              Next.js app. The form includes:
+              You now have a fully functional Juicebox payment form in your Next.js app. The form
+              includes:
             </p>
             <ul className="list-disc list-inside mt-4 space-y-2 text-green-700 dark:text-green-400">
               <li>Multi-chain support (Mainnet, Base, Optimism, Arbitrum)</li>

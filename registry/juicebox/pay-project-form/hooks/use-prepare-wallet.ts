@@ -2,17 +2,13 @@
 
 import { useAccount, useSwitchChain } from "wagmi";
 
-export type PrepareWalletResult =
-  | { success: true }
-  | { success: false; error: string };
+export type PrepareWalletResult = { success: true } | { success: false; error: string };
 
 export function usePrepareWallet() {
   const { chainId: connectedChainId, isConnected, address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
 
-  const prepareWallet = async (
-    targetChainId: number
-  ): Promise<PrepareWalletResult> => {
+  const prepareWallet = async (targetChainId: number): Promise<PrepareWalletResult> => {
     // Check if wallet is connected
     if (!isConnected) {
       return { success: false, error: "Wallet not connected" };
