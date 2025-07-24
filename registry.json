@@ -24,11 +24,11 @@
           "type": "registry:component"
         },
         {
-          "path": "registry/juicebox/common/lib/api.ts",
+          "path": "registry/juicebox/common/lib/juicebox-api.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/juicebox/common/lib/chains.ts",
+          "path": "registry/juicebox/common/lib/juicebox-chains.ts",
           "type": "registry:lib"
         }
       ]
@@ -102,15 +102,15 @@
           "type": "registry:component"
         },
         {
-          "path": "registry/juicebox/common/lib/abis.ts",
+          "path": "registry/juicebox/common/lib/juicebox-abis.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/juicebox/common/lib/api.ts",
+          "path": "registry/juicebox/common/lib/juicebox-api.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/juicebox/common/lib/chains.ts",
+          "path": "registry/juicebox/common/lib/juicebox-chains.ts",
           "type": "registry:lib"
         },
         {
@@ -118,7 +118,7 @@
           "type": "registry:lib"
         },
         {
-          "path": "registry/juicebox/common/lib/quote.ts",
+          "path": "registry/juicebox/common/lib/juicebox-quote.ts",
           "type": "registry:lib"
         },
         {
