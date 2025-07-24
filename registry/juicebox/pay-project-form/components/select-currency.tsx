@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { jbChains, type Currency } from "@/registry/juicebox/common/lib/chains";
+import { jbChains, type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { useState } from "react";
 import { Chain } from "viem";
 import { useAccount, useBalance } from "wagmi";

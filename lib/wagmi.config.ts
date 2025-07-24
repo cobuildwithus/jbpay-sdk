@@ -1,5 +1,5 @@
 import { getRpcUrl } from "@/lib/client";
-import { jbChains } from "@/registry/juicebox/common/lib/chains";
+import { jbChains } from "@/registry/juicebox/common/lib/juicebox-chains";
 import {
   arbitrum,
   arbitrumSepolia,

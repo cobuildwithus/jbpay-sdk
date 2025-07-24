@@ -1,11 +1,14 @@
 "use client";
 
-import { jbMultiTerminalAbi, jbSwapTerminalAbi } from "@/registry/juicebox/common/lib/abis";
+import {
+  jbMultiTerminalAbi,
+  jbSwapTerminalAbi,
+} from "@/registry/juicebox/common/lib/juicebox-abis";
 import {
   ETH_ADDRESS,
   JBSWAPTERMINAL_ADDRESS,
   type Currency,
-} from "@/registry/juicebox/common/lib/chains";
+} from "@/registry/juicebox/common/lib/juicebox-chains";
 import { useEffect, useState } from "react";
 import { parseEther, parseUnits, zeroAddress } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract, type BaseError } from "wagmi";

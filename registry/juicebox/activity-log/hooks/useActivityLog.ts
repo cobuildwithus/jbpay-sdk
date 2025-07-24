@@ -1,6 +1,6 @@
 "use client";
 
-import { API_URL } from "@/registry/juicebox/common/lib/api";
+import { API_URL } from "@/registry/juicebox/common/lib/juicebox-api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export interface ActivityLogItem {

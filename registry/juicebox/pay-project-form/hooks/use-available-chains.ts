@@ -1,9 +1,9 @@
 "use client";
 
-import { jbChains } from "@/registry/juicebox/common/lib/chains";
+import { jbChains } from "@/registry/juicebox/common/lib/juicebox-chains";
+import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { useMemo } from "react";
 import { type Chain } from "viem";
-import { Project } from "./use-projects";
 
 /**
  * Returns the list of chains that have a published configuration for the given set of projects.

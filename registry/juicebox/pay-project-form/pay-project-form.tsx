@@ -7,7 +7,11 @@ import { Label } from "@/components/ui/label";
 import { formatProjectInput, parseProjectInput } from "@/lib/chains";
 import { ConnectButton } from "@/registry/juicebox/common/components/connect-button";
 import revnetIcon from "@/registry/juicebox/common/images/revnet.svg";
-import { ETH_ADDRESS, jbChains, type Currency } from "@/registry/juicebox/common/lib/chains";
+import {
+  ETH_ADDRESS,
+  jbChains,
+  type Currency,
+} from "@/registry/juicebox/common/lib/juicebox-chains";
 import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";
 import { SelectCurrency } from "@/registry/juicebox/pay-project-form/components/select-currency";
 import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";

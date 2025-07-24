@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ConnectButton } from "@/registry/juicebox/common/components/connect-button";
-import { type Currency } from "@/registry/juicebox/common/lib/chains";
+import { type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { usePayProject } from "@/registry/juicebox/pay-project-form/hooks/use-pay-project";
 import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { useTokenQuote } from "@/registry/juicebox/pay-project-form/hooks/use-token-quote";
+import { Status } from "@/registry/juicebox/pay-project-form/hooks/use-transaction-status";
 import { Chain } from "viem";
 import { useAccount } from "wagmi";
-import { Status } from "../hooks/use-transaction-status";
 
 interface Props {
   isOpen: boolean;

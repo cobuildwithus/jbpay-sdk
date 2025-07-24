@@ -1,6 +1,6 @@
 "use client";
 
-import { API_URL } from "@/registry/juicebox/common/lib/api";
+import { API_URL } from "@/registry/juicebox/common/lib/juicebox-api";
 import { useQuery } from "@tanstack/react-query";
 
 export interface Project {

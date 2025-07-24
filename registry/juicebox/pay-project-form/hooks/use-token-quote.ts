@@ -1,8 +1,8 @@
 import { getClient } from "@/lib/client";
-import { jbPricesAbi } from "@/registry/juicebox/common/lib/abis";
-import { type Currency, JBPRICES_ADDRESS } from "@/registry/juicebox/common/lib/chains";
 import { getEthUsdRate } from "@/registry/juicebox/common/lib/eth-price";
-import { calculateTokensFromEth } from "@/registry/juicebox/common/lib/quote";
+import { jbPricesAbi } from "@/registry/juicebox/common/lib/juicebox-abis";
+import { type Currency, JBPRICES_ADDRESS } from "@/registry/juicebox/common/lib/juicebox-chains";
+import { calculateTokensFromEth } from "@/registry/juicebox/common/lib/juicebox-quote";
 import { useEffect, useState } from "react";
 import { formatEther } from "viem";
 

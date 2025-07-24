@@ -2,9 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  ActivityLogItem,
+  useActivityLog,
+} from "@/registry/juicebox/activity-log/hooks/useActivityLog";
 import { ChainLogo } from "@/registry/juicebox/common/components/chain-logo";
-import { explorerUrl } from "@/registry/juicebox/common/lib/chains";
-import { ActivityLogItem, useActivityLog } from "./hooks/useActivityLog";
+import { explorerUrl } from "@/registry/juicebox/common/lib/juicebox-chains";
 
 interface Props {
   chainId: number;

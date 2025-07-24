@@ -5,10 +5,10 @@ import {
   FLOWS_ADDRESS,
   SUPPORTED_TOKENS,
   type Currency,
-} from "@/registry/juicebox/common/lib/chains";
+} from "@/registry/juicebox/common/lib/juicebox-chains";
+import { Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { useMemo } from "react";
 import { type Chain } from "viem";
-import { Project } from "./use-projects";
 
 /**
  * Returns list of currencies user can pay with for given chain + project.
