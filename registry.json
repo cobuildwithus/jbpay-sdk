@@ -123,7 +123,8 @@
         },
         {
           "path": "registry/juicebox/common/images/revnet.svg",
-          "type": "registry:file"
+          "type": "registry:file",
+          "target": "registry/juicebox/common/images/revnet.svg"
         }
       ]
     }
