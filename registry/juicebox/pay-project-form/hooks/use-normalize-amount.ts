@@ -1,6 +1,6 @@
 "use client";
 
-import { getClient } from "@/lib/client";
+import { getClient } from "@/registry/juicebox/common/lib/viem-client";
 import { type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { erc20Abi, parseEther, parseUnits } from "viem";
 

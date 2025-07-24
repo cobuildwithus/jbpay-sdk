@@ -1,4 +1,4 @@
-import { getClient } from "@/lib/client";
+import { getClient } from "@/registry/juicebox/common/lib/viem-client";
 import { getEthUsdRate } from "@/registry/juicebox/common/lib/eth-price";
 import { jbPricesAbi } from "@/registry/juicebox/common/lib/juicebox-abis";
 import { type Currency, JBPRICES_ADDRESS } from "@/registry/juicebox/common/lib/juicebox-chains";

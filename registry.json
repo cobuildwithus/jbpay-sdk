@@ -125,6 +125,10 @@
           "path": "registry/juicebox/common/images/revnet.svg",
           "type": "registry:file",
           "target": "registry/juicebox/common/images/revnet.svg"
+        },
+        {
+          "path": "registry/juicebox/common/lib/viem-client.ts",
+          "type": "registry:lib"
         }
       ]
     }
