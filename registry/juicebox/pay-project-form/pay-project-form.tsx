@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatProjectInput, parseProjectInput } from "@/lib/chains";
 import { ConnectButton } from "@/registry/juicebox/common/components/connect-button";
 import revnetIcon from "@/registry/juicebox/common/images/revnet.svg";
 import {
   ETH_ADDRESS,
+  formatProjectInput,
   jbChains,
+  parseProjectInput,
   type Currency,
 } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   ActivityLogItem,
   useActivityLog,
-} from "@/registry/juicebox/activity-log/hooks/useActivityLog";
+} from "@/registry/juicebox/activity-log/hooks/use-activity-log";
 import { ChainLogo } from "@/registry/juicebox/common/components/chain-logo";
 import { explorerUrl } from "@/registry/juicebox/common/lib/juicebox-chains";
 

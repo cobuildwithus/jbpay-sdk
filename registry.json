@@ -9,14 +9,14 @@
       "title": "Activity Log",
       "description": "A component to display project activity history with pagination",
       "registryDependencies": ["button"],
-      "dependencies": ["@tanstack/react-query"],
+      "dependencies": ["@tanstack/react-query", "viem"],
       "files": [
         {
           "path": "registry/juicebox/activity-log/activity-log.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/juicebox/activity-log/hooks/useActivityLog.ts",
+          "path": "registry/juicebox/activity-log/hooks/use-activity-log.ts",
           "type": "registry:hook"
         },
         {
