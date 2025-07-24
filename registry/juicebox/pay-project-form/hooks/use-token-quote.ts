@@ -1,13 +1,10 @@
+import { getClient } from "@/lib/client";
+import { jbPricesAbi } from "@/registry/juicebox/common/lib/abis";
+import { type Currency, JBPRICES_ADDRESS } from "@/registry/juicebox/common/lib/chains";
+import { getEthUsdRate } from "@/registry/juicebox/common/lib/eth-price";
+import { calculateTokensFromEth } from "@/registry/juicebox/common/lib/quote";
 import { useEffect, useState } from "react";
 import { formatEther } from "viem";
-import {
-  type Currency,
-  JBPRICES_ADDRESS,
-} from "@/registry/juicebox/pay-project-form/lib/chains";
-import { getClient } from "@/lib/client";
-import { jbPricesAbi } from "@/registry/juicebox/pay-project-form/lib/abis";
-import { calculateTokensFromEth } from "@/registry/juicebox/pay-project-form/lib/quote";
-import { getEthUsdRate } from "@/registry/juicebox/pay-project-form/lib/eth-price";
 
 interface Params {
   chainId: number;
@@ -17,13 +14,7 @@ interface Params {
   tokenPrice: string; // price of project token in wei
 }
 
-export function useTokenQuote({
-  chainId,
-  projectId,
-  amount,
-  currency,
-  tokenPrice,
-}: Params) {
+export function useTokenQuote({ chainId, projectId, amount, currency, tokenPrice }: Params) {
   const [quote, setQuote] = useState("");
   const [loading, setLoading] = useState(false);
 

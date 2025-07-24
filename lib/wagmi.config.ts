@@ -1,4 +1,5 @@
-import { jbChains } from "@/registry/juicebox/pay-project-form/lib/chains";
+import { getRpcUrl } from "@/lib/client";
+import { jbChains } from "@/registry/juicebox/common/lib/chains";
 import {
   arbitrum,
   arbitrumSepolia,
@@ -10,7 +11,6 @@ import {
   sepolia,
 } from "viem/chains";
 import { createConfig, http, injected, Transport } from "wagmi";
-import { getRpcUrl } from "@/lib/client";
 
 export const transports: Record<number, Transport> = {
   [mainnet.id]: http(getRpcUrl(mainnet, "http")),

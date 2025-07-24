@@ -21,17 +21,13 @@ export const jbChains = [
   arbitrumSepolia,
 ] as const satisfies Chain[];
 
-export const JBMULTITERMINAL_ADDRESS =
-  "0xdb9644369c79c3633cde70d2df50d827d7dc7dbc" as const;
+export const JBMULTITERMINAL_ADDRESS = "0xdb9644369c79c3633cde70d2df50d827d7dc7dbc" as const;
 
-export const JBDIRECTORY_ADDRESS =
-  "0x0bc9f153dee4d3d474ce0903775b9b2aaae9aa41" as const;
+export const JBDIRECTORY_ADDRESS = "0x0bc9f153dee4d3d474ce0903775b9b2aaae9aa41" as const;
 
-export const ETH_ADDRESS =
-  "0x000000000000000000000000000000000000eeee" as const;
+export const ETH_ADDRESS = "0x000000000000000000000000000000000000eeee" as const;
 
-export const FLOWS_ADDRESS =
-  "0xa66c1faefd257dbe9da50e56c7816b5710c9e2a1" as const;
+export const FLOWS_ADDRESS = "0xa66c1faefd257dbe9da50e56c7816b5710c9e2a1" as const;
 
 export const JBSWAPTERMINAL_ADDRESS: Record<number, `0x${string}`> = {
   [mainnet.id]: "0xdd98b25631aa9372a8cf09912b803d2ad80db161",
@@ -45,8 +41,7 @@ export const JBSWAPTERMINAL_ADDRESS: Record<number, `0x${string}`> = {
 } as const;
 
 // JBPrices contract (price oracle) - same address across chains
-export const JBPRICES_ADDRESS =
-  "0xe712d14b04f1a1fe464be930e3ea72b9b0a141d7" as const;
+export const JBPRICES_ADDRESS = "0xe712d14b04f1a1fe464be930e3ea72b9b0a141d7" as const;
 
 // Supported tokens for swap terminal
 export const SUPPORTED_TOKENS: Record<number, Record<string, `0x${string}`>> = {
@@ -94,4 +89,23 @@ export interface Currency {
   symbol: string;
   address: `0x${string}`;
   isNative: boolean;
+}
+
+export function explorerUrl(chainId: number, address: string, type: "address" | "tx") {
+  switch (chainId) {
+    case mainnet.id:
+      return `https://etherscan.io/${type}/${address}`;
+    case optimism.id:
+      return `https://optimistic.etherscan.io/${type}/${address}`;
+    case arbitrum.id:
+      return `https://arbiscan.io/${type}/${address}`;
+    case base.id:
+      return `https://basescan.org/${type}/${address}`;
+    case sepolia.id:
+      return `https://sepolia.etherscan.io/${type}/${address}`;
+    case optimismSepolia.id:
+      return `https://optimistic.etherscan.io/${type}/${address}`;
+    case arbitrumSepolia.id:
+      return `https://arbiscan.io/${type}/${address}`;
+  }
 }
