@@ -30,20 +30,16 @@ interface Props {
 
 export function TransactionConfirmationModal(props: Props) {
   const { isOpen, onOpenChange, amount, project, chain, currency } = props;
-  const {
-    payProject,
-    approveToken,
-    errorMessage,
-    status,
-    reset,
-    needsApproval,
-  } = usePayProject(project, amount, currency.address);
+  const { payProject, approveToken, errorMessage, status, reset, needsApproval } = usePayProject(
+    project,
+    amount,
+    currency.address
+  );
   const { address } = useAccount();
 
   // Quote tokens to receive
   const { quote: tokenQuote } = useTokenQuote({
     chainId: chain.id,
-    projectId: project.projectId.toString(),
     amount,
     currency,
     project,
@@ -88,9 +84,7 @@ export function TransactionConfirmationModal(props: Props) {
             </div>
             {tokenQuote && (
               <div className="flex justify-between items-center mt-2">
-                <span className="text-sm text-muted-foreground">
-                  You Receive:
-                </span>
+                <span className="text-sm text-muted-foreground">You Receive:</span>
                 <span className="text-lg font-medium">
                   ~{tokenQuote} {project.token.symbol}
                 </span>
@@ -158,16 +152,11 @@ export function TransactionConfirmationModal(props: Props) {
               )}
             </div>
             <div
-              className={cn(
-                "text-xs text-muted-foreground text-center min-h-4 -mt-1",
-                {
-                  "text-destructive": status === "error",
-                  "animate-pulse":
-                    status === "pending" ||
-                    status === "connecting" ||
-                    status === "confirming",
-                }
-              )}
+              className={cn("text-xs text-muted-foreground text-center min-h-4 -mt-1", {
+                "text-destructive": status === "error",
+                "animate-pulse":
+                  status === "pending" || status === "connecting" || status === "confirming",
+              })}
             >
               {getStatusMessage(status, errorMessage)}
             </div>

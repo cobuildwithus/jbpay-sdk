@@ -2,13 +2,11 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import revnetIcon from "@/registry/juicebox/common/images/revnet.svg";
 import {
   formatProjectInput,
   parseProjectInput,
 } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { type Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { type Chain } from "viem";
 
@@ -55,13 +53,19 @@ export function ProjectInput(props: {
           <span className="text-xs text-muted-foreground truncate flex items-center gap-1">
             {project?.name}
             {project?.isRevnet && (
-              <Image
-                src={revnetIcon}
-                alt="Revnet"
-                width={16}
-                height={16}
-                className="inline-block"
-              />
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 288 140"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="inline-block size-4"
+              >
+                <path
+                  d="M287.451 69.6339L173.138 0.0389404L150.509 58.7621L54.0338 0.0389404L0.246094 139.618L142.096 80.5446L119.35 139.618L287.451 69.6339Z"
+                  fill="black"
+                />
+              </svg>
             )}
           </span>
         </div>

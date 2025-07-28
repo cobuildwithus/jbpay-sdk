@@ -44,44 +44,44 @@ export const JBSWAPTERMINAL_ADDRESS: Record<number, `0x${string}`> = {
 export const JBPRICES_ADDRESS = "0xe712d14b04f1a1fe464be930e3ea72b9b0a141d7" as const;
 
 // Supported tokens for swap terminal
-export const SUPPORTED_TOKENS: Record<number, Record<string, `0x${string}`>> = {
+export const SUPPORTED_TOKENS: Record<number, Record<string, [`0x${string}`, number]>> = {
   // Ethereum Mainnet
   [mainnet.id]: {
-    DAI: "0x6b175474e89094c44da98b954eedeac495271d0f",
-    USDC: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    USDT: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    DAI: ["0x6b175474e89094c44da98b954eedeac495271d0f", 18],
+    USDC: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", 6],
+    USDT: ["0xdac17f958d2ee523a2206206994597c13d831ec7", 6],
   },
   // Arbitrum Mainnet
   [arbitrum.id]: {
-    DAI: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
-    USDC: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-    USDT: "0xfd086bc7cdc5c481dcc9c85ebe478a1c0b69fcbb9",
+    DAI: ["0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", 18],
+    USDC: ["0xaf88d065e77c8cc2239327c5edb3a432268e5831", 6],
+    USDT: ["0xfd086bc7cdc5c481dcc9c85ebe478a1c0b69fcbb9", 6],
   },
   // Optimism Mainnet
   [optimism.id]: {
-    DAI: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
-    USDC: "0x0b2c639c533813f4aa9d7837caf62653d097ff85",
-    USDT: "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
+    DAI: ["0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", 18],
+    USDC: ["0x0b2c639c533813f4aa9d7837caf62653d097ff85", 6],
+    USDT: ["0x94b008aa00579c1307b0ef2c499ad98a8ce58e58", 6],
   },
   // Base Mainnet
   [base.id]: {
-    USDC: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+    USDC: ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", 6],
   },
   // Ethereum Sepolia
   [sepolia.id]: {
-    USDC: "0x1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+    USDC: ["0x1c7d4b196cb0c7b01d743fbc6116a902379c7238", 6],
   },
   // Base Sepolia
   [baseSepolia.id]: {
-    USDC: "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+    USDC: ["0x036cbd53842c5426634e7929541ec2318f3dcf7e", 6],
   },
   // Optimism Sepolia
   [optimismSepolia.id]: {
-    USDC: "0x5fd84259d66cd46123540766be93dfe6d43130d7",
+    USDC: ["0x5fd84259d66cd46123540766be93dfe6d43130d7", 6],
   },
   // Arbitrum Sepolia
   [arbitrumSepolia.id]: {
-    USDC: "0x75faf114eafb1bdbe2f0316df893fd58ce46aa4d",
+    USDC: ["0x75faf114eafb1bdbe2f0316df893fd58ce46aa4d", 6],
   },
 } as const;
 
@@ -89,6 +89,7 @@ export interface Currency {
   symbol: string;
   address: `0x${string}`;
   isNative: boolean;
+  decimals: number;
 }
 
 export function explorerUrl(chainId: number, address: string, type: "address" | "tx") {
@@ -145,3 +146,26 @@ export const formatProjectInput = (chain: Chain, projectId: string | number): st
   if (!shortcut) return "";
   return `${shortcut}:${projectId}`;
 };
+
+export function getChain(chainId: number) {
+  switch (chainId) {
+    case base.id:
+      return base;
+    case baseSepolia.id:
+      return baseSepolia;
+    case mainnet.id:
+      return mainnet;
+    case optimism.id:
+      return optimism;
+    case arbitrum.id:
+      return arbitrum;
+    case sepolia.id:
+      return sepolia;
+    case optimismSepolia.id:
+      return optimismSepolia;
+    case arbitrumSepolia.id:
+      return arbitrumSepolia;
+    default:
+      throw new Error(`Unsupported chainId: ${chainId}`);
+  }
+}

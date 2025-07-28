@@ -127,7 +127,6 @@ export function PayProjectForm(props: Props) {
             <TokensReceived
               amount={amount}
               chainId={selectedChain.id}
-              projectId={project?.projectId?.toString() || "0"}
               currency={selectedCurrency}
               project={project}
               symbol={project?.token.symbol || ""}

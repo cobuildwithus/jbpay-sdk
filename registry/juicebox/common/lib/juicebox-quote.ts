@@ -1,4 +1,5 @@
-import { formatEther, parseEther } from "viem";
+import { formatEther, parseEther, parseUnits } from "viem";
+import { Currency } from "./juicebox-chains";
 
 export function calculateTokensFromEth(ethAmount: string, price: string): string {
   if (!price || !ethAmount || ethAmount === "") return "";
@@ -16,5 +17,16 @@ export function calculateTokensFromEth(ethAmount: string, price: string): string
     return Number.parseFloat(rounded).toString();
   } catch (error) {
     return "";
+  }
+}
+
+export function normalizeAmount(amount: string, currency: Currency): bigint {
+  if (currency.isNative) return parseEther(amount);
+
+  try {
+    return parseUnits(amount, currency.decimals);
+  } catch (e) {
+    console.error("Error reading token decimals:", e);
+    return parseEther(amount);
   }
 }

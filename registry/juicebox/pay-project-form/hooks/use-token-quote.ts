@@ -1,35 +1,25 @@
-import { getClient } from "@/registry/juicebox/common/lib/viem-client";
+"use client";
+
 import { getEthUsdRate } from "@/registry/juicebox/common/lib/eth-price";
 import { jbPricesAbi } from "@/registry/juicebox/common/lib/juicebox-abis";
-import {
-  type Currency,
-  JBPRICES_ADDRESS,
-} from "@/registry/juicebox/common/lib/juicebox-chains";
+import { type Currency, JBPRICES_ADDRESS } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { calculateTokensFromEth } from "@/registry/juicebox/common/lib/juicebox-quote";
+import { type Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 import { useEffect, useState } from "react";
 import { formatEther } from "viem";
-import { type Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
+import { usePublicClient } from "wagmi";
 
 interface Params {
   chainId: number;
-  projectId: string | bigint; // Juicebox project ID
   amount: string;
   currency: Currency;
   project: Project;
 }
 
-export function useTokenQuote({
-  chainId,
-  projectId,
-  amount,
-  currency,
-  project,
-}: Params) {
+export function useTokenQuote({ chainId, amount, currency, project }: Params) {
   const [quote, setQuote] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Public client via helper (browser-safe)
-  const client = getClient(chainId);
+  const client = usePublicClient({ chainId });
 
   useEffect(() => {
     if (!amount || Number(amount) === 0) {
@@ -42,16 +32,15 @@ export function useTokenQuote({
     const fetchQuote = async () => {
       const { accountingTokenPrice, ethPrice } = project.token;
       try {
+        if (!client) throw new Error("No wallet client");
+
         if (ethPrice !== "0" && currency.isNative) {
           // Native currency path - reuse existing util
           const q = calculateTokensFromEth(amount, ethPrice);
           if (!cancelled) setQuote(q);
           return;
         }
-        if (
-          accountingTokenPrice !== "0" &&
-          currency.address === project.accountingToken
-        ) {
+        if (accountingTokenPrice !== "0" && currency.address === project.accountingToken) {
           const q = calculateTokensFromEth(amount, accountingTokenPrice);
           if (!cancelled) setQuote(q);
           return;
@@ -61,16 +50,13 @@ export function useTokenQuote({
         const pricingCurrencyId = 3n; // USD for stablecoins
         const unitCurrencyId = 1n; // ETH
 
-        const pricesAddr = JBPRICES_ADDRESS;
-        const pricesClient = client;
-
         setLoading(true);
         // Request price (pricingCurrency per unitCurrency) with 18 decimals
-        const priceBigInt = (await pricesClient.readContract({
-          address: pricesAddr,
+        const priceBigInt = (await client.readContract({
+          address: JBPRICES_ADDRESS,
           abi: jbPricesAbi,
           functionName: "pricePerUnitOf",
-          args: [BigInt(projectId), pricingCurrencyId, unitCurrencyId, 18n],
+          args: [BigInt(project.projectId), pricingCurrencyId, unitCurrencyId, 18n],
         })) as bigint;
 
         const priceDecimal = parseFloat(formatEther(priceBigInt)); // USD per 1 ETH
@@ -93,7 +79,6 @@ export function useTokenQuote({
           return;
         }
 
-        // graceful fallback
         if (!cancelled) setQuote("");
       } finally {
         if (!cancelled) setLoading(false);

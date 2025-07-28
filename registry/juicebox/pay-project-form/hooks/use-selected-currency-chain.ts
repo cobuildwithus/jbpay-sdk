@@ -1,11 +1,14 @@
 "use client";
 
-import { ETH_ADDRESS, type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
-import { getChain } from "@/registry/juicebox/common/lib/viem-client";
+import {
+  ETH_ADDRESS,
+  getChain,
+  type Currency,
+} from "@/registry/juicebox/common/lib/juicebox-chains";
 import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";
 import { useAvailableCurrencies } from "@/registry/juicebox/pay-project-form/hooks/use-available-currencies";
 import { useCurrentProject } from "@/registry/juicebox/pay-project-form/hooks/use-current-project";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Chain } from "viem";
 import { base } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
@@ -19,6 +22,16 @@ export function useSelectedCurrencyChain(defaultProjectId = 3, defaultChainId: n
   const { address } = useAccount();
   const defaultChain = getChain(defaultChainId);
 
+  const defaultCurrency = useMemo(
+    () => ({
+      symbol: defaultChain.nativeCurrency.symbol,
+      address: ETH_ADDRESS,
+      isNative: true,
+      decimals: defaultChain.nativeCurrency.decimals,
+    }),
+    [defaultChain]
+  );
+
   const [projectId, setProjectId] = useState(defaultProjectId);
   const [selectedChain, setSelectedChain] = useState<Chain>(defaultChain);
 
@@ -28,20 +41,12 @@ export function useSelectedCurrencyChain(defaultProjectId = 3, defaultChainId: n
   const availableCurrencies = useAvailableCurrencies(selectedChain, project);
 
   // Initialize with the native currency of the default chain
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>({
-    symbol: defaultChain.nativeCurrency.symbol,
-    address: ETH_ADDRESS,
-    isNative: true,
-  });
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(defaultCurrency);
 
   // Auto-reset to native currency when switching chains
   // This prevents invalid currency selections when moving between chains
   useEffect(() => {
-    setSelectedCurrency({
-      symbol: selectedChain.nativeCurrency.symbol,
-      address: ETH_ADDRESS,
-      isNative: true,
-    });
+    setSelectedCurrency(defaultCurrency);
   }, [selectedChain]);
 
   // Auto-correct chain selection if current chain becomes unavailable

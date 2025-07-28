@@ -90,10 +90,6 @@
           "type": "registry:hook"
         },
         {
-          "path": "registry/juicebox/pay-project-form/hooks/use-normalize-amount.ts",
-          "type": "registry:hook"
-        },
-        {
           "path": "registry/juicebox/pay-project-form/hooks/use-prepare-wallet.ts",
           "type": "registry:hook"
         },
@@ -135,15 +131,6 @@
         },
         {
           "path": "registry/juicebox/common/lib/juicebox-quote.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "registry/juicebox/common/images/revnet.svg",
-          "type": "registry:file",
-          "target": "registry/juicebox/common/images/revnet.svg"
-        },
-        {
-          "path": "registry/juicebox/common/lib/viem-client.ts",
           "type": "registry:lib"
         }
       ]

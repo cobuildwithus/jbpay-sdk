@@ -7,18 +7,16 @@ import { type Project } from "@/registry/juicebox/pay-project-form/hooks/use-pro
 interface Props {
   amount: string;
   chainId: number;
-  projectId: string;
   currency: Currency;
   project: Project;
   symbol: string;
 }
 
 export function TokensReceived(props: Props) {
-  const { amount, chainId, projectId, currency, project, symbol } = props;
+  const { amount, chainId, currency, project, symbol } = props;
 
   const { quote: tokenQuote } = useTokenQuote({
     chainId,
-    projectId,
     amount,
     currency,
     project,
@@ -29,9 +27,7 @@ export function TokensReceived(props: Props) {
       {tokenQuote && (
         <div
           className={`text-center text-sm text-muted-foreground transition-opacity duration-300 -mt-2.5 ${
-            amount && Number.parseFloat(amount) > 0
-              ? "opacity-100"
-              : "opacity-0"
+            amount && Number.parseFloat(amount) > 0 ? "opacity-100" : "opacity-0"
           }`}
         >
           You'll receive ~{tokenQuote} {symbol}

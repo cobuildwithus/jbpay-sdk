@@ -47,6 +47,7 @@ export function useAvailableCurrencies(
         symbol: selectedChain.nativeCurrency.symbol,
         address: ETH_ADDRESS,
         isNative: true,
+        decimals: selectedChain.nativeCurrency.decimals,
       });
     }
 
@@ -56,11 +57,14 @@ export function useAvailableCurrencies(
 
     if (isAccountingTokenEth) {
       const supported = SUPPORTED_TOKENS[selectedChain.id]
-        ? Object.entries(SUPPORTED_TOKENS[selectedChain.id]).map(([symbol, address]) => ({
-            symbol,
-            address,
-            isNative: false,
-          }))
+        ? Object.entries(SUPPORTED_TOKENS[selectedChain.id]).map(
+            ([symbol, [address, decimals]]) => ({
+              symbol,
+              address,
+              isNative: false,
+              decimals,
+            })
+          )
         : [];
       currencies.push(...supported);
     }
@@ -76,6 +80,7 @@ export function useAvailableCurrencies(
           symbol: project.accountingTokenSymbol,
           address: project.accountingToken,
           isNative: false,
+          decimals: project.accountingDecimals,
         });
       }
     }
