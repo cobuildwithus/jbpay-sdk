@@ -123,14 +123,16 @@ export function PayProjectForm() {
             </Button>
           )}
 
-          <TokensReceived
-            amount={amount}
-            chainId={selectedChain.id}
-            projectId={project?.projectId?.toString() || "0"}
-            currency={selectedCurrency}
-            tokenPrice={project?.token.price || "0"}
-            symbol={project?.token.symbol || ""}
-          />
+          {project && (
+            <TokensReceived
+              amount={amount}
+              chainId={selectedChain.id}
+              projectId={project?.projectId?.toString() || "0"}
+              currency={selectedCurrency}
+              project={project}
+              symbol={project?.token.symbol || ""}
+            />
+          )}
         </CardContent>
       </Card>
 

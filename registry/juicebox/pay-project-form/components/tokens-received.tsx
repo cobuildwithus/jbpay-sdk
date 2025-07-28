@@ -2,25 +2,26 @@
 
 import { useTokenQuote } from "@/registry/juicebox/pay-project-form/hooks/use-token-quote";
 import { type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
+import { type Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
 
 interface Props {
   amount: string;
   chainId: number;
   projectId: string;
   currency: Currency;
-  tokenPrice: string;
+  project: Project;
   symbol: string;
 }
 
 export function TokensReceived(props: Props) {
-  const { amount, chainId, projectId, currency, tokenPrice, symbol } = props;
+  const { amount, chainId, projectId, currency, project, symbol } = props;
 
   const { quote: tokenQuote } = useTokenQuote({
     chainId,
     projectId,
     amount,
     currency,
-    tokenPrice,
+    project,
   });
 
   return (

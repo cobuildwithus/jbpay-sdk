@@ -12,7 +12,8 @@ export interface Project {
     name: string;
     symbol: string;
     address: string;
-    price: string;
+    ethPrice: string;
+    accountingTokenPrice: string;
     disclosure: string;
   };
   suckerGroupId: string;
@@ -33,10 +34,14 @@ export const useProjects = (args: {
   return useQuery({
     queryKey: ["projects", chainId, projectId],
     queryFn: async () => {
-      const response = await fetch(`${API_URL}/project/${chainId}/${projectId}`);
+      const response = await fetch(
+        `${API_URL}/project/${chainId}/${projectId}`
+      );
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch projects: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch projects: ${response.status} ${response.statusText}`
+        );
       }
 
       return response.json() as Promise<Project[]>;
