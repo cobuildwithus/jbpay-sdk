@@ -11,13 +11,17 @@ import {
 } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { useEffect, useState } from "react";
 import { parseEther, parseUnits, zeroAddress } from "viem";
-import { useWaitForTransactionReceipt, useWriteContract, type BaseError } from "wagmi";
-import { useNormalizeAmount } from "./use-normalize-amount";
-import { usePrepareWallet } from "./use-prepare-wallet";
-import { usePrimaryTerminal } from "./use-primary-terminal";
-import { Project } from "./use-projects";
-import { useTokenAllowance } from "./use-token-allowance";
-import { Status } from "./use-transaction-status";
+import {
+  useWaitForTransactionReceipt,
+  useWriteContract,
+  type BaseError,
+} from "wagmi";
+import { useNormalizeAmount } from "@/registry/juicebox/pay-project-form/hooks/use-normalize-amount";
+import { usePrepareWallet } from "@/registry/juicebox/pay-project-form/hooks/use-prepare-wallet";
+import { usePrimaryTerminal } from "@/registry/juicebox/pay-project-form/hooks/use-primary-terminal";
+import { type Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
+import { useTokenAllowance } from "@/registry/juicebox/pay-project-form/hooks/use-token-allowance";
+import { type Status } from "@/registry/juicebox/pay-project-form/hooks/use-transaction-status";
 
 interface Args {
   projectId: bigint;
@@ -29,13 +33,21 @@ interface Args {
   accountingDecimals: number;
 }
 
-export function usePayProject(project: Project, amount: string, paymentToken: `0x${string}`) {
+export function usePayProject(
+  project: Project,
+  amount: string,
+  paymentToken: `0x${string}`
+) {
   const { chainId, projectId } = project;
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const { prepareWallet } = usePrepareWallet();
-  const { data: primaryTerminal } = usePrimaryTerminal(chainId, BigInt(projectId), paymentToken);
+  const { data: primaryTerminal } = usePrimaryTerminal(
+    chainId,
+    BigInt(projectId),
+    paymentToken
+  );
 
   const { data: hash, isPending, error, writeContract } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -103,7 +115,8 @@ export function usePayProject(project: Project, amount: string, paymentToken: `0
       const memo = "";
       const metadata = "0x0" as `0x${string}`;
 
-      const hasPrimaryTerminal = !!primaryTerminal && primaryTerminal !== zeroAddress;
+      const hasPrimaryTerminal =
+        !!primaryTerminal && primaryTerminal !== zeroAddress;
 
       if (hasPrimaryTerminal) {
         // Native token payment through multi-terminal
@@ -160,7 +173,11 @@ export function usePayProject(project: Project, amount: string, paymentToken: `0
     } catch (e) {
       console.error(e);
       setStatus("error");
-      setErrorMessage(e instanceof Error ? e.message : (e as any).shortMessage || "Unknown error");
+      setErrorMessage(
+        e instanceof Error
+          ? e.message
+          : (e as any).shortMessage || "Unknown error"
+      );
     }
   };
 
@@ -181,7 +198,9 @@ export function usePayProject(project: Project, amount: string, paymentToken: `0
       await approveToken(token, amount);
     } catch (e) {
       setStatus("error");
-      setErrorMessage(e instanceof Error ? e.message : "Failed to approve token");
+      setErrorMessage(
+        e instanceof Error ? e.message : "Failed to approve token"
+      );
     }
   };
 

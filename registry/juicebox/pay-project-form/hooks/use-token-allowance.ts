@@ -8,8 +8,8 @@ import {
   useWaitForTransactionReceipt,
   useReadContract,
 } from "wagmi";
-import { Project } from "./use-projects";
-import { Status } from "./use-transaction-status";
+import { type Project } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
+import { type Status } from "@/registry/juicebox/pay-project-form/hooks/use-transaction-status";
 
 export function useTokenAllowance(
   project: Project,

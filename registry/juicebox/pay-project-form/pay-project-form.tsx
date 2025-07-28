@@ -5,170 +5,52 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ConnectButton } from "@/registry/juicebox/common/components/connect-button";
-import revnetIcon from "@/registry/juicebox/common/images/revnet.svg";
-import {
-  ETH_ADDRESS,
-  formatProjectInput,
-  jbChains,
-  parseProjectInput,
-  type Currency,
-} from "@/registry/juicebox/common/lib/juicebox-chains";
 import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";
 import { SelectCurrency } from "@/registry/juicebox/pay-project-form/components/select-currency";
-import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";
-import { useAvailableCurrencies } from "@/registry/juicebox/pay-project-form/hooks/use-available-currencies";
-import { useProjects } from "@/registry/juicebox/pay-project-form/hooks/use-projects";
-import { useTokenQuote } from "@/registry/juicebox/pay-project-form/hooks/use-token-quote";
-import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import { Chain, formatEther } from "viem";
-import { base, mainnet } from "viem/chains";
-import { useAccount, useBalance } from "wagmi";
+import { useSelectedCurrencyChain } from "@/registry/juicebox/pay-project-form/hooks/use-selected-currency-chain";
+import { TokensReceived } from "@/registry/juicebox/pay-project-form/components/tokens-received";
+import { ProjectInput } from "@/registry/juicebox/pay-project-form/components/project-input";
+import { useEffect, useState } from "react";
+import { formatEther } from "viem";
+import { mainnet } from "viem/chains";
+import { useAccount } from "wagmi";
 
 // Optional environment variables
 const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
-const DEFAULT_CHAIN_ID = process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID;
 
 export function PayProjectForm() {
-  // Find the default chain or use the first available chain
-  const defaultChain = useMemo(() => {
-    if (DEFAULT_CHAIN_ID) {
-      const chainId = Number(DEFAULT_CHAIN_ID);
-      const foundChain = jbChains.find((chain) => chain.id === chainId);
-      if (foundChain) return foundChain;
-    }
-    return base; // Default to base
-  }, []);
-
-  // Initialize states
-  const [projectId, setProjectId] = useState(HARDCODED_PROJECT_ID || "3");
-  const [selectedChain, setSelectedChain] = useState<Chain>(defaultChain);
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>({
-    symbol: defaultChain.nativeCurrency.symbol,
-    address: ETH_ADDRESS,
-    isNative: true,
-  });
+  const { isConnected } = useAccount();
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showConnectButton, setShowConnectButton] = useState(true);
 
-  // Track the input value separately to allow free editing
-  const [inputValue, setInputValue] = useState(() => formatProjectInput(selectedChain, projectId));
-
-  // Handle project input changes
-  const handleProjectInputChange = (value: string) => {
-    setInputValue(value);
-    const { chain, projectId: parsedProjectId } = parseProjectInput(value);
-
-    // Only update if we have a valid chain and projectId
-    if (chain && parsedProjectId) {
-      setSelectedChain(chain);
-      setProjectId(parsedProjectId);
-    }
-  };
-
-  // Update input when chain changes from dropdown
-  useEffect(() => {
-    if (projectId) {
-      const formatted = formatProjectInput(selectedChain, projectId);
-      setInputValue(formatted);
-    }
-  }, [selectedChain, projectId]);
-
-  // Reset currency to native when chain changes
-  useEffect(() => {
-    setSelectedCurrency({
-      symbol: selectedChain.nativeCurrency.symbol,
-      address: ETH_ADDRESS,
-      isNative: true,
-    });
-  }, [selectedChain]);
-
-  const { isConnected, address } = useAccount();
-  const { data: balance } = useBalance({
-    chainId: selectedChain.id,
-    address,
-    token: selectedCurrency.isNative ? undefined : selectedCurrency.address,
-  });
-
-  // Fetch projects - only fires if both chainId and projectId are set
-  const { data: projects } = useProjects({
-    chainId: selectedChain.id,
+  const {
     projectId,
-  });
-
-  // Get the project for the selected chain
-  const project = useMemo(() => {
-    if (!projects || projects.length === 0) return null;
-    return projects.find((p) => p.chainId === selectedChain.id) || null;
-  }, [projects, selectedChain.id]);
-
-  // Derive chains user can select based on fetched project data
-  const availableChains = useAvailableChains(projects);
+    project,
+    selectedChain,
+    setSelectedChain,
+    setProjectId,
+    selectedCurrency,
+    setSelectedCurrency,
+    balance,
+  } = useSelectedCurrencyChain();
 
   useEffect(() => {
     setShowConnectButton(!isConnected);
   }, [isConnected]);
-
-  // Update selected chain if current chain is not available
-  useEffect(() => {
-    if (
-      availableChains.length > 0 &&
-      !availableChains.find((chain) => chain.id === selectedChain.id)
-    ) {
-      setSelectedChain(availableChains[0]);
-    }
-  }, [availableChains, selectedChain]);
-
-  // Calculate token quote
-  const { quote: tokenQuote } = useTokenQuote({
-    chainId: selectedChain.id,
-    projectId: project?.projectId?.toString() || "0",
-    amount,
-    currency: selectedCurrency,
-    tokenPrice: project?.token.price || "0",
-  });
-
-  const availableCurrencies = useAvailableCurrencies(selectedChain, project);
-
-  // Ensure selectedCurrency is always in availableCurrencies
-  useEffect(() => {
-    if (!availableCurrencies.find((c) => c.address === selectedCurrency.address)) {
-      setSelectedCurrency(availableCurrencies[0]);
-    }
-  }, [availableCurrencies, selectedCurrency.address]);
 
   return (
     <>
       <Card className="w-full max-w-md">
         <CardContent className="space-y-6">
           {!HARDCODED_PROJECT_ID && (
-            <div className="space-y-2">
-              <div className="flex justify-between space-x-2.5">
-                <Label htmlFor="projectId" className="text-sm font-medium">
-                  Project
-                </Label>
-                <span className="text-xs text-muted-foreground truncate flex items-center gap-1">
-                  {project?.name}
-                  {project?.isRevnet && (
-                    <Image
-                      src={revnetIcon}
-                      alt="Revnet"
-                      width={16}
-                      height={16}
-                      className="inline-block"
-                    />
-                  )}
-                </span>
-              </div>
-              <Input
-                id="projectId"
-                placeholder="chain:projectId (e.g. base:3)"
-                value={inputValue}
-                onChange={(e) => handleProjectInputChange(e.target.value)}
-                className="h-12"
-              />
-            </div>
+            <ProjectInput
+              selectedChain={selectedChain}
+              project={project}
+              projectId={projectId}
+              setSelectedChain={setSelectedChain}
+              setProjectId={setProjectId}
+            />
           )}
 
           <div className="space-y-2">
@@ -185,8 +67,8 @@ export function PayProjectForm() {
                 onSelectCurrency={(currency) => {
                   setSelectedCurrency(currency);
                 }}
-                availableChains={availableChains}
-                availableCurrencies={availableCurrencies}
+                projectId={projectId}
+                chainId={selectedChain.id}
               />
 
               <div className="relative">
@@ -208,7 +90,8 @@ export function PayProjectForm() {
                   onClick={() => {
                     if (selectedCurrency.isNative) {
                       const amount = Number(formatEther(balance?.value ?? 0n));
-                      const gasBuffer = selectedChain.id === mainnet.id ? 0.001 : 0.000025;
+                      const gasBuffer =
+                        selectedChain.id === mainnet.id ? 0.001 : 0.000025;
                       setAmount(Math.max(amount - gasBuffer, 0).toFixed(5));
                     } else {
                       // For ERC20 tokens, use the full balance
@@ -224,7 +107,10 @@ export function PayProjectForm() {
           </div>
 
           {showConnectButton ? (
-            <ConnectButton className="w-full h-12 text-lg font-medium" size="lg" />
+            <ConnectButton
+              className="w-full h-12 text-lg font-medium"
+              size="lg"
+            />
           ) : (
             <Button
               type="button"
@@ -237,15 +123,14 @@ export function PayProjectForm() {
             </Button>
           )}
 
-          {tokenQuote && (
-            <div
-              className={`text-center text-sm text-muted-foreground transition-opacity duration-300 -mt-2.5 ${
-                project && amount && Number.parseFloat(amount) > 0 ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              You'll receive ~{tokenQuote} {project?.token.symbol}
-            </div>
-          )}
+          <TokensReceived
+            amount={amount}
+            chainId={selectedChain.id}
+            projectId={project?.projectId?.toString() || "0"}
+            currency={selectedCurrency}
+            tokenPrice={project?.token.price || "0"}
+            symbol={project?.token.symbol || ""}
+          />
         </CardContent>
       </Card>
 

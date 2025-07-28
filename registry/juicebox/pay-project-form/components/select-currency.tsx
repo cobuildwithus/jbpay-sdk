@@ -1,47 +1,27 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { jbChains, type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
+import { type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { useState } from "react";
 import { Chain } from "viem";
 import { useAccount, useBalance } from "wagmi";
+import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";
+import { useAvailableCurrencies } from "@/registry/juicebox/pay-project-form/hooks/use-available-currencies";
+import { useCurrentProject } from "@/registry/juicebox/pay-project-form/hooks/use-current-project";
 
 interface Props {
   selectedChain: Chain;
   selectedCurrency: Currency;
   onSelectChain: (chain: Chain) => void;
   onSelectCurrency: (currency: Currency) => void;
-  availableChains?: Chain[];
-  availableCurrencies: Currency[];
-}
-
-function CurrencyBalance({ chainId, currency }: { chainId: number; currency: Currency }) {
-  const { address } = useAccount();
-  const { data: balance } = useBalance({
-    address,
-    chainId,
-    token: currency.isNative ? undefined : currency.address,
-  });
-
-  if (!balance) return null;
-
-  const formattedBalance = Number(balance.formatted).toFixed(4);
-  return <>{formattedBalance}</>;
-}
-
-function ChainBalance({ chainId }: { chainId: number }) {
-  const { address } = useAccount();
-  const { data: balance } = useBalance({
-    address,
-    chainId,
-  });
-
-  if (!balance) return null;
-
-  const formattedBalance = Number(balance.formatted).toFixed(4);
-  return <>{formattedBalance}</>;
+  projectId: string;
+  chainId: number;
 }
 
 export function SelectCurrency(props: Props) {
@@ -50,9 +30,13 @@ export function SelectCurrency(props: Props) {
     selectedCurrency,
     onSelectChain,
     onSelectCurrency,
-    availableChains = jbChains,
-    availableCurrencies,
+    projectId,
+    chainId,
   } = props;
+
+  const { project, projects } = useCurrentProject(projectId, chainId);
+  const availableChains = useAvailableChains(projects);
+  const availableCurrencies = useAvailableCurrencies(selectedChain, project);
 
   const [isChainOpen, setIsChainOpen] = useState(false);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
@@ -67,7 +51,9 @@ export function SelectCurrency(props: Props) {
             className="flex-1 h-auto p-2 justify-start text-left font-normal hover:bg-transparent cursor-pointer"
             type="button"
           >
-            <span className="text-sm text-muted-foreground truncate">on {selectedChain.name}</span>
+            <span className="text-sm text-muted-foreground truncate">
+              on {selectedChain.name}
+            </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="size-4 opacity-50"
@@ -103,7 +89,8 @@ export function SelectCurrency(props: Props) {
               >
                 <div className="font-medium text-sm">{chain.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  <ChainBalance chainId={chain.id} /> {chain.nativeCurrency.symbol}
+                  <ChainBalance chainId={chain.id} />{" "}
+                  {chain.nativeCurrency.symbol}
                 </div>
               </button>
             ))}
@@ -119,7 +106,9 @@ export function SelectCurrency(props: Props) {
             className="flex-1 h-auto p-2 justify-end text-right font-normal hover:bg-transparent cursor-pointer"
             type="button"
           >
-            <span className="text-sm font-medium truncate">{selectedCurrency.symbol}</span>
+            <span className="text-sm font-medium truncate">
+              {selectedCurrency.symbol}
+            </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="size-4 opacity-50"
@@ -149,13 +138,17 @@ export function SelectCurrency(props: Props) {
                   "w-full flex items-center justify-between p-3 rounded-lg transition-colors",
                   {
                     "bg-accent": selectedCurrency.address === currency.address,
-                    "hover:bg-accent/75": selectedCurrency.address !== currency.address,
+                    "hover:bg-accent/75":
+                      selectedCurrency.address !== currency.address,
                   }
                 )}
               >
                 <div className="font-medium text-sm">{currency.symbol}</div>
                 <div className="text-xs text-muted-foreground">
-                  <CurrencyBalance chainId={selectedChain.id} currency={currency} />{" "}
+                  <CurrencyBalance
+                    chainId={selectedChain.id}
+                    currency={currency}
+                  />{" "}
                   {currency.symbol}
                 </div>
               </button>
@@ -165,4 +158,37 @@ export function SelectCurrency(props: Props) {
       </Popover>
     </div>
   );
+}
+
+function CurrencyBalance({
+  chainId,
+  currency,
+}: {
+  chainId: number;
+  currency: Currency;
+}) {
+  const { address } = useAccount();
+  const { data: balance } = useBalance({
+    address,
+    chainId,
+    token: currency.isNative ? undefined : currency.address,
+  });
+
+  if (!balance) return null;
+
+  const formattedBalance = Number(balance.formatted).toFixed(4);
+  return <>{formattedBalance}</>;
+}
+
+function ChainBalance({ chainId }: { chainId: number }) {
+  const { address } = useAccount();
+  const { data: balance } = useBalance({
+    address,
+    chainId,
+  });
+
+  if (!balance) return null;
+
+  const formattedBalance = Number(balance.formatted).toFixed(4);
+  return <>{formattedBalance}</>;
 }
