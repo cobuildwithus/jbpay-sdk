@@ -23,14 +23,6 @@ export function TokensReceived(props: Props) {
     tokenPrice,
   });
 
-  console.log("tokenQuote", tokenQuote);
-  console.log("amount", amount);
-  console.log("chainId", chainId);
-  console.log("projectId", projectId);
-  console.log("currency", currency);
-  console.log("tokenPrice", tokenPrice);
-  console.log("symbol", symbol);
-
   return (
     <>
       {tokenQuote && (
