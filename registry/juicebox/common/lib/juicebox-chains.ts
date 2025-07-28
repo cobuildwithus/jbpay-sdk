@@ -140,7 +140,7 @@ export const parseProjectInput = (input: string): { chain: Chain | null; project
 };
 
 // Helper to format the combined input
-export const formatProjectInput = (chain: Chain, projectId: string): string => {
+export const formatProjectInput = (chain: Chain, projectId: string | number): string => {
   const shortcut = getChainShortcut(chain);
   if (!shortcut) return "";
   return `${shortcut}:${projectId}`;

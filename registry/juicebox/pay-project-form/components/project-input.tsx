@@ -15,18 +15,15 @@ import { type Chain } from "viem";
 export function ProjectInput(props: {
   selectedChain: Chain;
   project: Project | null;
-  projectId: string;
+  projectId: number;
   setSelectedChain: (chain: Chain) => void;
-  setProjectId: (projectId: string) => void;
+  setProjectId: (projectId: number) => void;
 }) {
-  const { selectedChain, project, projectId, setSelectedChain, setProjectId } =
-    props;
+  const { selectedChain, project, projectId, setSelectedChain, setProjectId } = props;
 
   // Track the formatted project input value (e.g., "base:3") separately from the parsed values
   // This allows users to freely edit the input while maintaining proper formatting
-  const [inputValue, setInputValue] = useState(() =>
-    formatProjectInput(selectedChain, projectId)
-  );
+  const [inputValue, setInputValue] = useState(() => formatProjectInput(selectedChain, projectId));
 
   // Keep the input field synchronized with the selected chain and project ID
   // This ensures the display stays consistent when chain is changed via dropdown
@@ -44,7 +41,7 @@ export function ProjectInput(props: {
     // Only update if we have a valid chain and projectId
     if (chain && parsedProjectId) {
       setSelectedChain(chain);
-      setProjectId(parsedProjectId);
+      setProjectId(Number(parsedProjectId));
     }
   };
 

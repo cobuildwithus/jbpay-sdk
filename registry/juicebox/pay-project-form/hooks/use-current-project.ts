@@ -6,7 +6,7 @@ import { useMemo } from "react";
 /**
  * Hook that fetches the current project for a given project ID and chain ID.
  */
-export function useCurrentProject(projectId: string, chainId: number) {
+export function useCurrentProject(projectId: number, chainId: number) {
   // Fetch project data for the current chain and project ID combination
   const { data: projects } = useProjects({
     chainId,

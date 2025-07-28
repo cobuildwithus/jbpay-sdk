@@ -1,11 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
 import { useState } from "react";
@@ -20,19 +16,13 @@ interface Props {
   selectedCurrency: Currency;
   onSelectChain: (chain: Chain) => void;
   onSelectCurrency: (currency: Currency) => void;
-  projectId: string;
+  projectId: number;
   chainId: number;
 }
 
 export function SelectCurrency(props: Props) {
-  const {
-    selectedChain,
-    selectedCurrency,
-    onSelectChain,
-    onSelectCurrency,
-    projectId,
-    chainId,
-  } = props;
+  const { selectedChain, selectedCurrency, onSelectChain, onSelectCurrency, projectId, chainId } =
+    props;
 
   const { project, projects } = useCurrentProject(projectId, chainId);
   const availableChains = useAvailableChains(projects);
@@ -51,9 +41,7 @@ export function SelectCurrency(props: Props) {
             className="flex-1 h-auto p-2 justify-start text-left font-normal hover:bg-transparent cursor-pointer"
             type="button"
           >
-            <span className="text-sm text-muted-foreground truncate">
-              on {selectedChain.name}
-            </span>
+            <span className="text-sm text-muted-foreground truncate">on {selectedChain.name}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="size-4 opacity-50"
@@ -89,8 +77,7 @@ export function SelectCurrency(props: Props) {
               >
                 <div className="font-medium text-sm">{chain.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  <ChainBalance chainId={chain.id} />{" "}
-                  {chain.nativeCurrency.symbol}
+                  <ChainBalance chainId={chain.id} /> {chain.nativeCurrency.symbol}
                 </div>
               </button>
             ))}
@@ -106,9 +93,7 @@ export function SelectCurrency(props: Props) {
             className="flex-1 h-auto p-2 justify-end text-right font-normal hover:bg-transparent cursor-pointer"
             type="button"
           >
-            <span className="text-sm font-medium truncate">
-              {selectedCurrency.symbol}
-            </span>
+            <span className="text-sm font-medium truncate">{selectedCurrency.symbol}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="size-4 opacity-50"
@@ -138,17 +123,13 @@ export function SelectCurrency(props: Props) {
                   "w-full flex items-center justify-between p-3 rounded-lg transition-colors",
                   {
                     "bg-accent": selectedCurrency.address === currency.address,
-                    "hover:bg-accent/75":
-                      selectedCurrency.address !== currency.address,
+                    "hover:bg-accent/75": selectedCurrency.address !== currency.address,
                   }
                 )}
               >
                 <div className="font-medium text-sm">{currency.symbol}</div>
                 <div className="text-xs text-muted-foreground">
-                  <CurrencyBalance
-                    chainId={selectedChain.id}
-                    currency={currency}
-                  />{" "}
+                  <CurrencyBalance chainId={selectedChain.id} currency={currency} />{" "}
                   {currency.symbol}
                 </div>
               </button>
@@ -160,13 +141,7 @@ export function SelectCurrency(props: Props) {
   );
 }
 
-function CurrencyBalance({
-  chainId,
-  currency,
-}: {
-  chainId: number;
-  currency: Currency;
-}) {
+function CurrencyBalance({ chainId, currency }: { chainId: number; currency: Currency }) {
   const { address } = useAccount();
   const { data: balance } = useBalance({
     address,

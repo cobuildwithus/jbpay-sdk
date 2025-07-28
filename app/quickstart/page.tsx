@@ -21,7 +21,7 @@ export default function QuickstartPage() {
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="language-bash">{`npx create-next-app@latest my-jb-app
 cd my-jb-app
-pnpm install
+pnpm i
 pnpm dev`}</code>
             </pre>
             <p className="mt-4 text-sm text-muted-foreground">When prompted, we recommend:</p>
@@ -154,19 +154,9 @@ export default function RootLayout({
               project root:
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-              <code className="language-bash">{`# Optional: Hardcode a project ID to hide the project ID input
-NEXT_PUBLIC_PROJECT_ID=1
-
-# Optional: Set default chain ID (1 = mainnet, 8453 = base, 10 = optimism, 42161 = arbitrum)
-NEXT_PUBLIC_DEFAULT_CHAIN_ID=1
-
-# Optional: Infura ID for better RPC performance
+              <code className="language-bash">{`# Optional: Infura ID for better RPC performance
 NEXT_PUBLIC_INFURA_ID=your_infura_project_id`}</code>
             </pre>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Note: The first two variables are specific to the Pay Project Form component. The
-              Infura ID is optional but recommended for production apps.
-            </p>
           </CardContent>
         </Card>
 
@@ -190,6 +180,51 @@ export default function Home() {
   );
 }`}</code>
             </pre>
+
+            <div className="mt-6">
+              <h4 className="font-semibold mb-2">Optional Props</h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                You can pass optional <code className="bg-muted px-2 py-1 rounded">projectId</code>{" "}
+                and <code className="bg-muted px-2 py-1 rounded">chainId</code> props to
+                pre-configure the form:
+              </p>
+              <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
+                <code className="language-typescript">{`// Pre-configure with specific project and chain
+<PayProjectForm projectId="123" chainId={1} />
+
+// Or just set a default project ID
+<PayProjectForm projectId="3" />
+
+// Or just set a default chain
+<PayProjectForm chainId={8453} />`}</code>
+              </pre>
+
+              <div className="mt-4 space-y-3">
+                <div>
+                  <h5 className="font-medium mb-2">Prop Behavior:</h5>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>
+                      • <code className="bg-muted px-2 py-1 rounded">projectId</code> - When set,
+                      this will hide the project ID input field and hardcode the form to use the
+                      specified project ID.
+                    </li>
+                    <li>
+                      • <code className="bg-muted px-2 py-1 rounded">chainId</code> - When set, this
+                      will set the default chain for the form. The chain ID must be one of the
+                      supported chains.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    <strong>Note:</strong> The form will only fetch project data when both a chain
+                    ID and project ID are set. Available chains in the dropdown are filtered based
+                    on which chains the project exists on.
+                  </p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

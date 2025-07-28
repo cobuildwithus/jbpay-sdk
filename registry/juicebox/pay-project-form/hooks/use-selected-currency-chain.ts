@@ -1,29 +1,25 @@
 "use client";
 
-import {
-  ETH_ADDRESS,
-  type Currency,
-} from "@/registry/juicebox/common/lib/juicebox-chains";
+import { ETH_ADDRESS, type Currency } from "@/registry/juicebox/common/lib/juicebox-chains";
+import { getChain } from "@/registry/juicebox/common/lib/viem-client";
 import { useAvailableChains } from "@/registry/juicebox/pay-project-form/hooks/use-available-chains";
 import { useAvailableCurrencies } from "@/registry/juicebox/pay-project-form/hooks/use-available-currencies";
-import { useDefaultChain } from "@/registry/juicebox/pay-project-form/hooks/use-default-chain";
 import { useCurrentProject } from "@/registry/juicebox/pay-project-form/hooks/use-current-project";
 import { useEffect, useState } from "react";
 import { Chain } from "viem";
+import { base } from "viem/chains";
 import { useAccount, useBalance } from "wagmi";
-
-const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
 
 /**
  * Hook that manages the selected currency and chain state for the pay project form.
  * Handles the complex interactions between project selection, chain availability,
  * and currency options based on the selected project's configuration.
  */
-export function useSelectedCurrencyChain() {
+export function useSelectedCurrencyChain(defaultProjectId = 3, defaultChainId: number = base.id) {
   const { address } = useAccount();
-  const defaultChain = useDefaultChain();
+  const defaultChain = getChain(defaultChainId);
 
-  const [projectId, setProjectId] = useState(HARDCODED_PROJECT_ID || "3");
+  const [projectId, setProjectId] = useState(defaultProjectId);
   const [selectedChain, setSelectedChain] = useState<Chain>(defaultChain);
 
   const { project, projects } = useCurrentProject(projectId, selectedChain.id);
@@ -62,9 +58,7 @@ export function useSelectedCurrencyChain() {
   // Auto-correct currency selection if current currency becomes unavailable
   // This ensures the selected currency is always valid for the current context
   useEffect(() => {
-    if (
-      !availableCurrencies.find((c) => c.address === selectedCurrency.address)
-    ) {
+    if (!availableCurrencies.find((c) => c.address === selectedCurrency.address)) {
       setSelectedCurrency(availableCurrencies[0]);
     }
   }, [availableCurrencies, selectedCurrency.address]);

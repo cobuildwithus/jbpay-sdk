@@ -6,19 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ConnectButton } from "@/registry/juicebox/common/components/connect-button";
 import { TransactionConfirmationModal } from "@/registry/juicebox/pay-project-form/components/confirm-transaction";
-import { SelectCurrency } from "@/registry/juicebox/pay-project-form/components/select-currency";
-import { useSelectedCurrencyChain } from "@/registry/juicebox/pay-project-form/hooks/use-selected-currency-chain";
-import { TokensReceived } from "@/registry/juicebox/pay-project-form/components/tokens-received";
 import { ProjectInput } from "@/registry/juicebox/pay-project-form/components/project-input";
+import { SelectCurrency } from "@/registry/juicebox/pay-project-form/components/select-currency";
+import { TokensReceived } from "@/registry/juicebox/pay-project-form/components/tokens-received";
+import { useSelectedCurrencyChain } from "@/registry/juicebox/pay-project-form/hooks/use-selected-currency-chain";
 import { useEffect, useState } from "react";
 import { formatEther } from "viem";
 import { mainnet } from "viem/chains";
 import { useAccount } from "wagmi";
 
-// Optional environment variables
-const HARDCODED_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
+interface Props {
+  projectId?: number;
+  chainId?: number;
+}
 
-export function PayProjectForm() {
+export function PayProjectForm(props: Props) {
+  const { projectId: defaultProjectId, chainId: defaultChainId } = props;
+
   const { isConnected } = useAccount();
   const [amount, setAmount] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -33,7 +37,7 @@ export function PayProjectForm() {
     selectedCurrency,
     setSelectedCurrency,
     balance,
-  } = useSelectedCurrencyChain();
+  } = useSelectedCurrencyChain(defaultProjectId, defaultChainId);
 
   useEffect(() => {
     setShowConnectButton(!isConnected);
@@ -43,7 +47,7 @@ export function PayProjectForm() {
     <>
       <Card className="w-full max-w-md">
         <CardContent className="space-y-6">
-          {!HARDCODED_PROJECT_ID && (
+          {!defaultProjectId && (
             <ProjectInput
               selectedChain={selectedChain}
               project={project}
@@ -90,8 +94,7 @@ export function PayProjectForm() {
                   onClick={() => {
                     if (selectedCurrency.isNative) {
                       const amount = Number(formatEther(balance?.value ?? 0n));
-                      const gasBuffer =
-                        selectedChain.id === mainnet.id ? 0.001 : 0.000025;
+                      const gasBuffer = selectedChain.id === mainnet.id ? 0.001 : 0.000025;
                       setAmount(Math.max(amount - gasBuffer, 0).toFixed(5));
                     } else {
                       // For ERC20 tokens, use the full balance
@@ -107,10 +110,7 @@ export function PayProjectForm() {
           </div>
 
           {showConnectButton ? (
-            <ConnectButton
-              className="w-full h-12 text-lg font-medium"
-              size="lg"
-            />
+            <ConnectButton className="w-full h-12 text-lg font-medium" size="lg" />
           ) : (
             <Button
               type="button"
