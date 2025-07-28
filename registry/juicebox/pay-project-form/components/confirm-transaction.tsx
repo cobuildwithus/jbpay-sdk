@@ -26,24 +26,20 @@ interface Props {
   project: Project;
   chain: Chain;
   currency: Currency;
+  onSuccess?: (hash: `0x${string}`) => void;
 }
 
 export function TransactionConfirmationModal(props: Props) {
-  const { isOpen, onOpenChange, amount, project, chain, currency } = props;
+  const { isOpen, onOpenChange, amount, project, chain, currency, onSuccess } = props;
   const { payProject, approveToken, errorMessage, status, reset, needsApproval } = usePayProject(
     project,
     amount,
-    currency.address
+    currency.address,
+    onSuccess
   );
   const { address } = useAccount();
 
-  // Quote tokens to receive
-  const { quote: tokenQuote } = useTokenQuote({
-    chainId: chain.id,
-    amount,
-    currency,
-    project,
-  });
+  const { quote: tokenQuote } = useTokenQuote({ chainId: chain.id, amount, currency, project });
 
   const closeModal = () => {
     reset();
@@ -141,7 +137,10 @@ export function TransactionConfirmationModal(props: Props) {
                         });
                       }}
                       className="flex-1"
-                      disabled={status === "pending" || status === "confirming"}
+                      variant={status === "success" ? "outline" : "default"}
+                      disabled={
+                        status === "pending" || status === "confirming" || status === "success"
+                      }
                     >
                       {status === "pending" || status === "confirming"
                         ? "Processing..."

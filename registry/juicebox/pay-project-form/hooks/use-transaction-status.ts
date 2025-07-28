@@ -3,13 +3,7 @@
 import { useEffect, useState } from "react";
 import { type BaseError } from "wagmi";
 
-export type Status =
-  | "idle"
-  | "connecting"
-  | "pending"
-  | "confirming"
-  | "success"
-  | "error";
+export type Status = "idle" | "connecting" | "pending" | "confirming" | "success" | "error";
 
 interface TransactionStatusParams {
   // Payment transaction
@@ -91,9 +85,7 @@ export function useTransactionStatus(params: TransactionStatusParams) {
 
     if (approvalError) {
       setStatus("error");
-      setErrorMessage(
-        (approvalError as BaseError).shortMessage || approvalError.message
-      );
+      setErrorMessage((approvalError as BaseError).shortMessage || approvalError.message);
     }
   }, [
     isPending,

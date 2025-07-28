@@ -18,10 +18,11 @@ import { useAccount } from "wagmi";
 interface Props {
   projectId?: number;
   chainId?: number;
+  onSuccess?: (hash: `0x${string}`) => void;
 }
 
 export function PayProjectForm(props: Props) {
-  const { projectId: defaultProjectId, chainId: defaultChainId } = props;
+  const { projectId: defaultProjectId, chainId: defaultChainId, onSuccess } = props;
 
   const { isConnected } = useAccount();
   const [amount, setAmount] = useState("");
@@ -143,6 +144,7 @@ export function PayProjectForm(props: Props) {
           chain={selectedChain}
           project={project}
           currency={selectedCurrency}
+          onSuccess={onSuccess}
         />
       )}
     </>

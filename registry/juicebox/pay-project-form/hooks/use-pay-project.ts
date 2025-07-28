@@ -29,7 +29,12 @@ interface Args {
   accountingDecimals: number;
 }
 
-export function usePayProject(project: Project, amount: string, paymentToken: `0x${string}`) {
+export function usePayProject(
+  project: Project,
+  amount: string,
+  paymentToken: `0x${string}`,
+  onSuccess?: (hash: `0x${string}`) => void
+) {
   const { chainId, projectId } = project;
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -37,10 +42,18 @@ export function usePayProject(project: Project, amount: string, paymentToken: `0
   const { prepareWallet } = usePrepareWallet();
   const { data: primaryTerminal } = usePrimaryTerminal(chainId, BigInt(projectId), paymentToken);
 
-  const { data: hash, isPending, error, writeContract } = useWriteContract();
+  const {
+    data: hash,
+    isPending,
+    error,
+    writeContract,
+    reset: resetWriteContract,
+  } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+
+  const [callbackCalled, setCallbackCalled] = useState(false);
 
   const { approveToken, needsApproval, approvalHash } = useTokenAllowance(
     project,
@@ -73,6 +86,12 @@ export function usePayProject(project: Project, amount: string, paymentToken: `0
       setErrorMessage((error as BaseError).shortMessage || error.message);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (!onSuccess || callbackCalled || !hash) return;
+    setCallbackCalled(true);
+    onSuccess?.(hash);
+  }, [isSuccess, hash, callbackCalled, onSuccess]);
 
   const payProject = async (args: Args) => {
     try {
@@ -192,8 +211,10 @@ export function usePayProject(project: Project, amount: string, paymentToken: `0
     approveToken: handleApproveToken,
     needsApproval,
     reset: () => {
+      resetWriteContract();
       setStatus("idle");
       setErrorMessage("");
+      setCallbackCalled(false);
     },
   };
 }
